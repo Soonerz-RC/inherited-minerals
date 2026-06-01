@@ -1,12 +1,10 @@
 import { PageShell, DisclaimerNote } from "@/components/SiteLayout";
 import { usePageMeta } from "@/hooks/use-page-meta";
 
-// Company / legal-entity details are placeholders until finalized. Update the
-// constants below (or wire to env/CMS later) before launch.
-const COMPANY = "[Company Legal Name]";
-const CONTACT_EMAIL = "[privacy@yourdomain.com]";
-const MAILING_ADDRESS = "[Company mailing address]";
-const EFFECTIVE_DATE = "[Effective date]";
+const COMPANY = "OklahomaMinerals.com";
+const CONTACT_EMAIL = "g.knight@oklahomaminerals.com";
+const MAILING_ADDRESS = "1930 Village Center Circle, 3-251, Las Vegas, NV 89134";
+const EFFECTIVE_DATE = "June 1, 2026";
 
 export default function Privacy() {
   usePageMeta(
@@ -131,7 +129,7 @@ export default function Privacy() {
           <h2>Contact us</h2>
           <p>
             Questions about this policy or your information? Contact us at{" "}
-            {CONTACT_EMAIL} or {MAILING_ADDRESS}.
+            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> or {MAILING_ADDRESS}.
           </p>
         </div>
 

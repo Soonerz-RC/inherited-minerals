@@ -1,10 +1,10 @@
 import { PageShell, DisclaimerNote } from "@/components/SiteLayout";
 import { usePageMeta } from "@/hooks/use-page-meta";
 
-const COMPANY = "[Company Legal Name]";
-const CONTACT_EMAIL = "[legal@yourdomain.com]";
-const GOVERNING_STATE = "[State]";
-const EFFECTIVE_DATE = "[Effective date]";
+const COMPANY = "OklahomaMinerals.com";
+const CONTACT_EMAIL = "g.knight@oklahomaminerals.com";
+const GOVERNING_STATE = "Nevada";
+const EFFECTIVE_DATE = "June 1, 2026";
 
 export default function Terms() {
   usePageMeta(
@@ -106,7 +106,7 @@ export default function Terms() {
           </p>
 
           <h2>Contact</h2>
-          <p>Questions about these Terms? Contact us at {CONTACT_EMAIL}.</p>
+          <p>Questions about these Terms? Contact us at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
         </div>
 
         <DisclaimerNote className="mt-10" />
