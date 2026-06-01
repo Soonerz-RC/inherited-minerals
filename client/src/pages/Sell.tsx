@@ -26,10 +26,14 @@ import { CheckCircle2, ShieldCheck, Lock, Scale } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { PageShell, DisclaimerNote } from "@/components/SiteLayout";
+import { PhoneCTA } from "@/components/PhoneCTA";
+import { DISPLAY_PHONE_NUMBER } from "@/lib/analytics";
 import { HONEST_DEAL, DOC_OPTIONS } from "@/lib/content";
+import { getAttribution } from "@/lib/attribution";
 import { insertReviewRequestSchema, type InsertReviewRequest } from "@shared/schema";
 
 const US_STATES = [
@@ -41,6 +45,7 @@ const US_STATES = [
 
 export default function Sell() {
   const { toast } = useToast();
+  const [, navigate] = useLocation();
   const [submitted, setSubmitted] = useState(false);
 
   const form = useForm<InsertReviewRequest>({
@@ -58,12 +63,17 @@ export default function Sell() {
 
   const mutation = useMutation({
     mutationFn: async (data: InsertReviewRequest) => {
-      const res = await apiRequest("POST", "/api/review-requests", data);
+      const res = await apiRequest("POST", "/api/review-requests", {
+        ...data,
+        ...getAttribution(),
+      });
       return await res.json();
     },
     onSuccess: () => {
       setSubmitted(true);
       form.reset();
+      // The thank-you page confirms next steps and fires the conversion event.
+      navigate("/thank-you/review");
     },
     onError: (e: Error) => {
       toast({ title: "Couldn't submit your request", description: e.message, variant: "destructive" });
@@ -85,6 +95,11 @@ export default function Sell() {
             we'll review your situation privately, then walk you through what we
             see — with no obligation to sell.
           </p>
+          {DISPLAY_PHONE_NUMBER && (
+            <p className="mt-5 text-sm text-muted-foreground">
+              Prefer to talk first? <PhoneCTA location="sell-header" className="ml-1" />
+            </p>
+          )}
         </div>
       </section>
 
@@ -334,6 +349,10 @@ export default function Sell() {
                   </Button>
                   <p className="text-center text-xs text-muted-foreground">
                     No obligation. We'll never share your details with marketers.
+                    By submitting, you agree to our{" "}
+                    <a href="#/privacy" className="underline hover:text-primary">Privacy Policy</a>{" "}
+                    and{" "}
+                    <a href="#/terms" className="underline hover:text-primary">Terms of Use</a>.
                   </p>
                 </form>
               </Form>

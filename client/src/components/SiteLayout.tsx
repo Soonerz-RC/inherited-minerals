@@ -106,8 +106,15 @@ export function SiteFooter() {
           <div>
             <h2 className="text-sm font-semibold text-foreground">Owners</h2>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/sell" className="hover:text-primary">Sell or value minerals</Link></li>
+              <li><Link href="/value-my-minerals" className="hover:text-primary">Value my minerals</Link></li>
+              <li><Link href="/got-an-offer" className="hover:text-primary">I got an offer</Link></li>
               <li><Link href="/sell" className="hover:text-primary">Request a private review</Link></li>
+            </ul>
+            <h2 className="mt-6 text-sm font-semibold text-foreground">Legal</h2>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li><Link href="/privacy" className="hover:text-primary">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-primary">Terms of Use</Link></li>
+              <li><Link href="/disclaimer" className="hover:text-primary">Disclaimer</Link></li>
             </ul>
           </div>
         </div>
@@ -117,7 +124,12 @@ export function SiteFooter() {
             <ShieldCheck className="h-3.5 w-3.5 text-primary" />
             Educational information only — not legal, tax, or financial advice.
           </p>
-          <p>© {new Date().getFullYear()} InheritedMineralRights.com</p>
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <Link href="/privacy" className="hover:text-primary">Privacy</Link>
+            <Link href="/terms" className="hover:text-primary">Terms</Link>
+            <Link href="/disclaimer" className="hover:text-primary">Disclaimer</Link>
+            <span>© {new Date().getFullYear()} InheritedMineralRights.com</span>
+          </p>
         </div>
       </div>
     </footer>

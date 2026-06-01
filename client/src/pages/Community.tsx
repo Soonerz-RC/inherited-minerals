@@ -23,6 +23,7 @@ import { MessageCircleQuestion, MessagesSquare, CheckCircle2 } from "lucide-reac
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { PageShell, DisclaimerNote } from "@/components/SiteLayout";
@@ -30,10 +31,12 @@ import {
   QA_CATEGORIES,
   SAMPLE_QUESTIONS,
 } from "@/lib/content";
+import { getAttribution } from "@/lib/attribution";
 import { insertQuestionSchema, type InsertQuestion, type Question } from "@shared/schema";
 
 export default function Community() {
   const { toast } = useToast();
+  const [, navigate] = useLocation();
 
   const { data: posted = [] } = useQuery<Question[]>({
     queryKey: ["/api/questions"],
@@ -52,18 +55,17 @@ export default function Community() {
 
   const mutation = useMutation({
     mutationFn: async (data: InsertQuestion) => {
-      const res = await apiRequest("POST", "/api/questions", data);
+      const res = await apiRequest("POST", "/api/questions", {
+        ...data,
+        ...getAttribution(),
+      });
       return await res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/questions"] });
       form.reset();
-      toast({
-        title: "Question posted",
-        description:
-          "Thanks for sharing. In this prototype your question is saved and shown below.",
-      });
-      document.getElementById("recent-questions")?.scrollIntoView({ behavior: "smooth" });
+      // The thank-you page confirms next steps and fires the conversion event.
+      navigate("/thank-you/question");
     },
     onError: (e: Error) => {
       toast({ title: "Couldn't post your question", description: e.message, variant: "destructive" });

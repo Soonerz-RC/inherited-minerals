@@ -1,5 +1,14 @@
-// In-memory store; resets on cold start. The Sell form only needs a successful
-// response to confirm submission, so this degrades gracefully without a DB.
+import {
+  json,
+  supabaseEnabled,
+  supabaseInsert,
+  extractAttribution,
+  sendLeadNotification,
+  escapeHtml,
+} from "./_shared.mjs";
+
+// In-memory fallback; resets on cold start. Used only when Supabase isn't
+// configured, so the Sell form still confirms submission without a DB.
 const reviewRequests = [];
 let nextId = 1;
 
@@ -18,8 +27,31 @@ function validate(body) {
   return { errors, name, email, state, producingStatus };
 }
 
+async function notify(record) {
+  const rows = [
+    ["Name", record.name],
+    ["Email", record.email],
+    ["State", record.state],
+    ["County", record.county],
+    ["Producing", record.producing_status],
+    ["Documents", (record.documents || []).join(", ")],
+    ["Notes", record.notes],
+    ["Source page", record.source_page],
+    ["UTM source", record.utm_source],
+    ["UTM campaign", record.utm_campaign],
+  ]
+    .filter(([, v]) => v)
+    .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0;font-weight:600">${escapeHtml(k)}</td><td>${escapeHtml(v)}</td></tr>`)
+    .join("");
+  await sendLeadNotification({
+    subject: `New private review request — ${record.name} (${record.state})`,
+    html: `<h2>New private review request</h2><table>${rows}</table>`,
+  });
+}
+
 export default async (req) => {
   if (req.method === "GET") {
+    // GET only serves the in-memory list; durable rows live in Supabase.
     return json(reviewRequests, 200);
   }
 
@@ -33,27 +65,47 @@ export default async (req) => {
     const { errors, name, email, state, producingStatus } = validate(body);
     if (errors.length) return json({ message: errors[0] }, 400);
 
+    const documents = Array.isArray(body?.documents) ? body.documents.map(String) : [];
+    const county = body?.county ? String(body.county) : null;
+    const notes = body?.notes ? String(body.notes) : null;
+    const attribution = extractAttribution(body);
+
+    if (supabaseEnabled) {
+      try {
+        const row = await supabaseInsert("review_requests", {
+          name,
+          email,
+          state,
+          county,
+          producing_status: producingStatus,
+          documents,
+          notes,
+          ...attribution,
+        });
+        await notify(row);
+        return json({ ...row, persistence: "supabase" }, 201);
+      } catch (err) {
+        // Fall through to memory so the user still gets a success response.
+        console.error("review-requests supabase error:", err.message);
+      }
+    }
+
     const created = {
       id: nextId++,
       name,
       email,
       state,
-      county: body?.county ? String(body.county) : null,
-      producingStatus,
-      documents: Array.isArray(body?.documents) ? body.documents.map(String) : [],
-      notes: body?.notes ? String(body.notes) : null,
-      createdAt: Date.now(),
+      county,
+      producing_status: producingStatus,
+      documents,
+      notes,
+      ...attribution,
+      created_at: new Date().toISOString(),
     };
     reviewRequests.unshift(created);
-    return json(created, 201);
+    await notify(created);
+    return json({ ...created, persistence: "memory" }, 201);
   }
 
   return json({ message: "Method not allowed" }, 405);
 };
-
-function json(payload, status) {
-  return new Response(JSON.stringify(payload), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-}
