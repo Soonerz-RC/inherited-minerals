@@ -44,6 +44,10 @@ export const insertReviewRequestSchema = createInsertSchema(reviewRequests)
     producingStatus: z.enum(["producing", "not_producing", "not_sure"]),
     documents: z.array(z.string()).default([]),
     notes: z.string().max(2000).optional(),
+    // Explicit agreement to the privacy/terms before we review their details.
+    consent: z.literal(true, {
+      errorMap: () => ({ message: "Please agree before submitting" }),
+    }),
   });
 
 export type InsertReviewRequest = z.infer<typeof insertReviewRequestSchema>;

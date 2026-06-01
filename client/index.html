@@ -28,6 +28,50 @@
     />
   </head>
   <body>
+    <!--
+      Hidden Netlify Forms detection stubs. Netlify's build-time bot scans the
+      static HTML to register forms; the live React forms then POST to "/" with
+      a matching `form-name` (see client/src/lib/leads.ts). These elements are
+      hidden and never submitted by users — they exist only so Netlify knows the
+      form names and field set. Keep the field names in sync with leads.ts.
+    -->
+    <form name="private-review-request" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <input type="text" name="state" />
+      <input type="text" name="county" />
+      <input type="text" name="producingStatus" />
+      <input type="text" name="documents" />
+      <textarea name="notes"></textarea>
+      <input type="text" name="consent" />
+      <input type="text" name="source_page" />
+      <input type="text" name="landing_page" />
+      <input type="text" name="referrer" />
+      <input type="text" name="utm_source" />
+      <input type="text" name="utm_medium" />
+      <input type="text" name="utm_campaign" />
+      <input type="text" name="utm_content" />
+      <input type="text" name="utm_term" />
+      <input type="text" name="bot-field" />
+    </form>
+
+    <form name="community-question" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="title" />
+      <textarea name="body"></textarea>
+      <input type="text" name="category" />
+      <input type="text" name="state" />
+      <input type="text" name="displayName" />
+      <input type="text" name="source_page" />
+      <input type="text" name="landing_page" />
+      <input type="text" name="referrer" />
+      <input type="text" name="utm_source" />
+      <input type="text" name="utm_medium" />
+      <input type="text" name="utm_campaign" />
+      <input type="text" name="utm_content" />
+      <input type="text" name="utm_term" />
+      <input type="text" name="bot-field" />
+    </form>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -27,13 +27,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { PageShell, DisclaimerNote } from "@/components/SiteLayout";
 import { PhoneCTA } from "@/components/PhoneCTA";
 import { DISPLAY_PHONE_NUMBER } from "@/lib/analytics";
 import { HONEST_DEAL, DOC_OPTIONS } from "@/lib/content";
 import { getAttribution } from "@/lib/attribution";
+import { submitReviewRequest } from "@/lib/leads";
 import { insertReviewRequestSchema, type InsertReviewRequest } from "@shared/schema";
 
 const US_STATES = [
@@ -58,16 +58,16 @@ export default function Sell() {
       producingStatus: "not_sure",
       documents: [],
       notes: "",
+      consent: undefined,
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (data: InsertReviewRequest) => {
-      const res = await apiRequest("POST", "/api/review-requests", {
+      await submitReviewRequest({
         ...data,
         ...getAttribution(),
       });
-      return await res.json();
     },
     onSuccess: () => {
       setSubmitted(true);
@@ -338,6 +338,36 @@ export default function Sell() {
                     )}
                   />
 
+                  <FormField
+                    control={form.control}
+                    name="consent"
+                    render={({ field }) => (
+                      <FormItem>
+                        <label
+                          htmlFor="consent"
+                          className="hover-elevate flex cursor-pointer items-start gap-2.5 rounded-md border border-border p-3 text-sm"
+                          data-testid="checkbox-consent"
+                        >
+                          <FormControl>
+                            <Checkbox
+                              id="consent"
+                              checked={field.value === true}
+                              onCheckedChange={(c) => field.onChange(c === true)}
+                              className="mt-0.5"
+                            />
+                          </FormControl>
+                          <span className="leading-relaxed text-muted-foreground">
+                            I agree to be contacted about my request and accept the{" "}
+                            <a href="#/privacy" className="underline hover:text-primary">Privacy Policy</a>{" "}
+                            and{" "}
+                            <a href="#/terms" className="underline hover:text-primary">Terms of Use</a>.
+                          </span>
+                        </label>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <Button
                     type="submit"
                     size="lg"
@@ -349,10 +379,6 @@ export default function Sell() {
                   </Button>
                   <p className="text-center text-xs text-muted-foreground">
                     No obligation. We'll never share your details with marketers.
-                    By submitting, you agree to our{" "}
-                    <a href="#/privacy" className="underline hover:text-primary">Privacy Policy</a>{" "}
-                    and{" "}
-                    <a href="#/terms" className="underline hover:text-primary">Terms of Use</a>.
                   </p>
                 </form>
               </Form>
