@@ -22,7 +22,6 @@ export const GOOGLE_ADS_ID = (env.VITE_GOOGLE_ADS_ID ?? "").trim();
 export const GOOGLE_ADS_REVIEW_LABEL = (env.VITE_GOOGLE_ADS_REVIEW_CONVERSION_LABEL ?? "").trim();
 export const GOOGLE_ADS_QUESTION_LABEL = (env.VITE_GOOGLE_ADS_QUESTION_CONVERSION_LABEL ?? "").trim();
 export const META_PIXEL_ID = (env.VITE_META_PIXEL_ID ?? "").trim();
-export const SITE_VERIFICATION = (env.VITE_GOOGLE_SITE_VERIFICATION ?? "").trim();
 
 export const PUBLIC_PHONE_NUMBER = (env.VITE_PUBLIC_PHONE_NUMBER ?? "").trim();
 export const CALL_TRACKING_NUMBER = (env.VITE_CALL_TRACKING_NUMBER ?? "").trim();
@@ -51,13 +50,9 @@ export function initAnalytics() {
   if (loaded || typeof window === "undefined") return;
   loaded = true;
 
-  // Search Console verification meta (also acceptable to add server-side).
-  if (SITE_VERIFICATION && !document.querySelector('meta[name="google-site-verification"]')) {
-    const m = document.createElement("meta");
-    m.name = "google-site-verification";
-    m.content = SITE_VERIFICATION;
-    document.head.appendChild(m);
-  }
+  // Search Console verification is injected into the static HTML <head> at build
+  // time (see the google-site-verification plugin in vite.config.ts), so it is
+  // present before any JS runs and we do not insert it here.
 
   // Google tag (gtag.js) — drives both GA4 and Google Ads.
   if (hasGoogle()) {
