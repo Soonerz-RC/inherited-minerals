@@ -5,7 +5,15 @@
 // notification → Outgoing webhook, pointing at /.netlify/functions/form-to-slack
 // (or /api/form-to-slack).
 
-import { json, buildLeadSlackMessage, postToSlack, slackEnabled } from "./_shared.mjs";
+import {
+  json,
+  buildLeadSlackMessage,
+  postToSlack,
+  slackEnabled,
+  airtableEnabled,
+  airtableCreateLead,
+  mapLeadToAirtableFields,
+} from "./_shared.mjs";
 
 // Fields we surface in the Slack message, in display order. Each entry maps a
 // canonical key to a human label; values are pulled from the (flattened) form
@@ -113,7 +121,10 @@ function normalize(body) {
     }
   }
 
-  return { formName, submittedAt, submissionId, fields };
+  // `merged` preserves the raw incoming keys (with aliases intact) so the
+  // Airtable mapper can resolve fields like `operatorInfo`/`questions_asked`
+  // that the Slack-oriented canonical flattening would otherwise collapse.
+  return { formName, submittedAt, submissionId, fields, merged };
 }
 
 function buildSlackMessage({ formName, submittedAt, submissionId, fields }) {
@@ -161,5 +172,23 @@ export default async (req) => {
     return json({ message: "Failed to deliver Slack notification." }, 502);
   }
 
-  return json({ ok: true, form: normalized.formName });
+  // Durable backup to Airtable. Best-effort and fully isolated: a missing config
+  // or a failed write is logged server-side but never turns a delivered Slack
+  // lead into an error response.
+  const airtable = { configured: airtableEnabled, ok: false };
+  if (airtableEnabled) {
+    try {
+      const airtableData = {
+        ...normalized.merged,
+        submitted_at: normalized.submittedAt || normalized.merged.submitted_at,
+      };
+      const fields = mapLeadToAirtableFields(airtableData, { slackPosted: true });
+      await airtableCreateLead(fields);
+      airtable.ok = true;
+    } catch (err) {
+      console.error("form-to-slack: Airtable write error:", err.message);
+    }
+  }
+
+  return json({ ok: true, form: normalized.formName, airtable });
 };

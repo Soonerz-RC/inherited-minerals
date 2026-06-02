@@ -173,6 +173,47 @@ the submission timestamp/ID when present. Leads whose name or notes contain
 If `SLACK_WEBHOOK_URL` is unset the function returns HTTP 500 without leaking any
 secret.
 
+### Airtable durable lead backup (Netlify Function → Airtable REST)
+
+The same `form-to-slack` function also writes every **successfully-Slacked** lead
+to an Airtable table, giving leads a durable, queryable home (including the
+assistant-handoff leads that bypass Netlify Forms). It is **best-effort and fully
+isolated**: if Airtable is not configured, or the write fails, the lead/Slack flow
+still returns success — the Airtable error is only logged server-side. The JSON
+response includes a safe status block, e.g. `{ ok: true, airtable: { configured:
+true, ok: false } }`.
+
+**Setup:**
+
+1. The base/table already exist: base `appTKXn43M25UPnYj`, table `Leads`
+   (`tblj8AafSljpchWoK`). All fields are text (multiline).
+2. Create an Airtable **Personal Access Token** at
+   <https://airtable.com/create/tokens> with the `data.records:write` scope on
+   that base.
+3. In Netlify: **Site settings → Environment variables**, add:
+
+   | Variable | Required | Notes |
+   |---|---|---|
+   | `AIRTABLE_PAT` | **Yes** | The PAT. `AIRTABLE_API_KEY` is accepted as an alias; `AIRTABLE_PAT` wins if both are set. |
+   | `AIRTABLE_BASE_ID` | No | Defaults to `appTKXn43M25UPnYj`; set to override. |
+   | `AIRTABLE_TABLE_ID` | No | Defaults to `tblj8AafSljpchWoK`; set to override. |
+
+   All three are server-only and never exposed to the client.
+4. No webhook/notification change is needed — the backup runs inside the existing
+   `form-to-slack` function, so both Netlify Form notifications and direct
+   assistant handoffs are covered automatically.
+
+**Field mapping** (incoming lead → Leads table): `Lead name` (name/lead_name),
+`Email`, `Phone`, `Source` (explicit `source`, else `Assistant` for
+`intent=assistant`, else derived from intent/source page), `Intent`, `Status`
+(always `New`), `Priority` (always `Medium`), `State`, `County`,
+`Operator / Royalty Info`, `Offer Amount`, `Producing Status`, `Owner Status`,
+`Notes` (notes/message/body), `Questions Asked` (explicit field, else extracted
+from the assistant summary's "— Questions asked —" bullets), `Landing Page`,
+`UTM Source/Medium/Campaign`, `Submitted At` (payload value or current ISO
+timestamp), and `Slack Posted` (`true` when the Slack post succeeded). Empty
+values are omitted rather than written as blanks.
+
 ### Later: migrate to a database (Neon/Supabase)
 
 The Netlify Functions for a database-backed path are kept in `netlify/functions`
