@@ -284,6 +284,19 @@ At` (ended_at/started_at, else current ISO), `Slack Posted` (`true` on success),
 and **`Priority`** — `High` when the call shows an offer amount, sell intent, a
 deadline/urgency, or producing/royalty-check status, otherwise `Medium`.
 
+**Multiple events per call.** Bland may emit several webhook events for a single
+call — sparse interim events (often only a `call_id` plus the `from`/`to`
+numbers and timestamps) as well as the final post-call event carrying the
+summary and collected variables. The endpoint ignores the sparse interim events
+so they don't create duplicate, near-empty leads ("Phone caller / Other /
+Medium"). An event is processed only when it is substantive: it has a non-empty
+`summary`/`transcript`/`analysis`/`disposition`/`outcome`, **or** it carries at
+least one collected lead variable (e.g. `full_name`, `email`, `callback_phone`,
+`mineral_state`, `mineral_county`, `offer_amount`, `primary_intent`) **and** is
+not still in progress. Ignored events return HTTP 200 with
+`{ "ok": true, "ignored": true, "reason": "..." }` so Bland treats them as
+delivered and does not retry.
+
 The Slack message is headed **"New phone lead — Inherited Mineral Rights"** and
 includes caller, phone, email, intent, state/county, offer amount, the call
 summary, the recording/transcript link (when present), and the call id.
@@ -292,8 +305,10 @@ summary, the recording/transcript link (when present), and the call id.
 
 - **Unit tests:** `npm test` runs `netlify/functions-tests/bland-call-lead.test.mjs`,
   covering payload normalization (nested variables, aliases, sparse/anonymous
-  calls), priority derivation, the Slack/Airtable flow, the 405/500/502 paths,
-  the no-token path, urlencoded bodies, and the optional secret.
+  calls), the substantive-vs-sparse event gate (interim events are ignored with
+  no Slack/Airtable calls), priority derivation, the Slack/Airtable flow, the
+  405/500/502 paths, the no-token path, urlencoded bodies, and the optional
+  secret.
 - **Live smoke test** (after deploy) — send a sample post-call payload and
   confirm it lands in Slack `#inherited` (and Airtable if configured):
 

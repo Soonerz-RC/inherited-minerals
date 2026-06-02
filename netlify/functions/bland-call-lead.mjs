@@ -162,6 +162,73 @@ function deriveQuestions(d) {
   );
 }
 
+// Bland emits several webhook events for a single call — sparse interim events
+// (often carrying only a call_id and the from/to numbers) as well as the final
+// post-call event with the summary and collected variables. Processing the
+// sparse ones creates duplicate, near-empty leads ("Phone caller / Other"), so
+// we only act on substantive events. An event is substantive when it carries a
+// summary/transcript/analysis/disposition/outcome, OR when it has at least one
+// collected lead variable AND it is not still in progress. Events whose only
+// useful fields are call_id/from/to/timestamps are ignored. Exported for tests.
+export function isSubstantiveCall(body) {
+  const d = flatten(body);
+
+  const hasNarrative = pick(
+    d.summary,
+    d.call_summary,
+    d.analysis_summary,
+    d.transcript,
+    d.analysis,
+    d.disposition,
+    d.outcome,
+  );
+  if (hasNarrative) return { ok: true };
+
+  const hasLeadVar = pick(
+    d.full_name,
+    d.fullName,
+    d.name,
+    d.caller_name,
+    d.callerName,
+    d.email,
+    d.Email,
+    d.callback_phone,
+    d.callbackPhone,
+    d.mineral_state,
+    d.mineralState,
+    d.mineral_county,
+    d.mineralCounty,
+    d.offer_amount,
+    d.offerAmount,
+    d.offer,
+    d.primary_intent,
+    d.primaryIntent,
+    d.intent,
+    d.operator_info,
+    d.operatorInfo,
+    d.ownership_status,
+    d.owner_status,
+    d.royalty_check_status,
+    d.producing_status,
+    d.questions_asked,
+    d.questionsAsked,
+  );
+
+  if (!hasLeadVar) {
+    return { ok: false, reason: "no summary/transcript/outcome or collected lead variables" };
+  }
+
+  // Has a collected variable, but skip it if the call is explicitly still
+  // active/in-progress (the final event will arrive with the same data).
+  const status = (pick(d.status, d.call_status) || "").toLowerCase();
+  const inProgress = ["in-progress", "in_progress", "inprogress", "active", "ringing", "queued", "started", "started_at"];
+  if (inProgress.some((s) => status === s || status.includes(s))) {
+    return { ok: false, reason: `call still in progress (status="${status}")` };
+  }
+
+  return { ok: true };
+}
+
 // Normalize a generic Bland post-call payload into the lead `data` shape that
 // mapLeadToAirtableFields and the Slack builder consume. Exported for tests.
 export function normalizeBlandCall(body) {
@@ -283,6 +350,15 @@ export default async (req) => {
   const body = await parseBody(req);
   if (body == null) {
     return json({ message: "Invalid request body." }, 400);
+  }
+
+  // Bland fires multiple events per call; ignore sparse/interim ones so we don't
+  // create duplicate empty leads. Return 200 so Bland treats it as delivered and
+  // does not retry.
+  const substantive = isSubstantiveCall(body);
+  if (!substantive.ok) {
+    console.log(`bland-call-lead: ignoring sparse event — ${substantive.reason}`);
+    return json({ ok: true, ignored: true, reason: substantive.reason });
   }
 
   const normalized = normalizeBlandCall(body);
