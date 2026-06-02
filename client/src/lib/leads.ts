@@ -87,19 +87,41 @@ export async function submitReviewRequest(
   await postToNetlifyForms(REVIEW_FORM_NAME, data);
 }
 
+// The live, confirmed-working Slack delivery endpoint. We call the full
+// function path directly (not via the /api/* redirect) because production QA
+// verified this exact path returns 200 and posts to #inherited. Assistant leads
+// post here so they don't depend on Netlify Forms (whose SPA "/" submission was
+// silently swallowed by the SPA fallback redirect) or on a newly added function.
+const FORM_TO_SLACK_ENDPOINT = "/.netlify/functions/form-to-slack";
+
 /**
- * Submit an assistant handoff lead. Unlike the landing-page forms, this always
- * POSTs JSON to the dedicated `/api/assistant-lead` Netlify Function, which
- * delivers the lead to Slack (#inherited) directly and records it via email /
- * Supabase when configured. Netlify Forms could not be reliably triggered from
- * the SPA assistant flow (the POST to "/" was swallowed by the SPA fallback
- * redirect), so assistant leads bypass Netlify Forms. `apiRequest` throws on a
- * non-2xx response, so callers only see success when the lead truly went out.
+ * Submit an assistant handoff lead. Posts JSON directly to the live
+ * `form-to-slack` Netlify Function in the same `{ payload: { form_name, data } }`
+ * shape Netlify's form notifications use, so the function's normalizer surfaces
+ * every field in the Slack message. The lead is delivered to Slack (#inherited)
+ * under `private-review-request` with `intent=assistant`.
+ *
+ * NOTE: this delivers to Slack ONLY — it does NOT create a Netlify Forms
+ * submission, so Netlify's built-in email/CSV storage is bypassed for assistant
+ * leads. Slack is the source of record for them. The promise rejects on any
+ * non-2xx response, so callers (and the conversion redirect) only see success
+ * when the lead was actually delivered.
  */
 export async function submitAssistantLead(
   data: Record<string, unknown>,
 ): Promise<void> {
-  await apiRequest("POST", "/api/assistant-lead", data);
+  const res = await fetch(FORM_TO_SLACK_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      payload: { form_name: REVIEW_FORM_NAME, data },
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(
+      "We couldn't send your summary just now. Please try again in a moment.",
+    );
+  }
 }
 
 /**

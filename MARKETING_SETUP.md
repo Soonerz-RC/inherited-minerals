@@ -94,14 +94,21 @@ the dashboard, with no database, no env vars, and no secrets to manage.
 
 > **Assistant handoff is the exception — it does NOT use Netlify Forms.** The
 > `/#/ask` "send this summary for review" handoff POSTs JSON directly to the
-> `/api/assistant-lead` Netlify Function (`netlify/functions/assistant-lead.mjs`),
-> which delivers the lead to Slack `#inherited` via `SLACK_WEBHOOK_URL` and sends
-> the email / Supabase row when those are configured. Netlify Forms could not be
+> live `form-to-slack` function at `/.netlify/functions/form-to-slack`
+> (`client/src/lib/leads.ts` → `submitAssistantLead`), in the same
+> `{ payload: { form_name, data } }` shape Netlify's form notifications use. That
+> function posts the lead to Slack `#inherited` via `SLACK_WEBHOOK_URL` under
+> `private-review-request` with `intent=assistant`. Netlify Forms could not be
 > reliably triggered from the SPA assistant flow (the AJAX POST to `/` was
 > swallowed by the SPA fallback redirect and silently not recorded), so assistant
 > leads bypass Netlify Forms and will **not** appear under **Site → Forms**.
-> Requires only `SLACK_WEBHOOK_URL` (already used by `form-to-slack`); the client
-> shows the thank-you/conversion page only after the function returns success.
+>
+> **Slack-only delivery:** because assistant leads do not create a Netlify Forms
+> submission, Netlify's built-in **email notifications and CSV storage do NOT
+> capture them** — Slack is their source of record. Requires only
+> `SLACK_WEBHOOK_URL` (already configured for `form-to-slack`). The client routes
+> to the thank-you/conversion page **only after** the function returns `ok`; a
+> non-2xx shows an error toast and keeps the user on the form.
 
 Each submission includes the form's own fields plus the attribution fields
 (`source_page`, `landing_page`, `referrer`, `utm_source`, `utm_medium`,
