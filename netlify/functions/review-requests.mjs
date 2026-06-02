@@ -31,11 +31,17 @@ async function notify(record) {
   const rows = [
     ["Name", record.name],
     ["Email", record.email],
+    ["Phone", record.phone],
     ["State", record.state],
     ["County", record.county],
+    ["Owner status", record.owner_status],
     ["Producing", record.producing_status],
+    ["Operator / royalty", record.operator_info],
+    ["Offer amount", record.offer_amount],
+    ["Urgency", record.urgency],
     ["Documents", (record.documents || []).join(", ")],
     ["Notes", record.notes],
+    ["Intent", record.intent],
     ["Source page", record.source_page],
     ["UTM source", record.utm_source],
     ["UTM campaign", record.utm_campaign],
@@ -68,7 +74,22 @@ export default async (req) => {
     const documents = Array.isArray(body?.documents) ? body.documents.map(String) : [];
     const county = body?.county ? String(body.county) : null;
     const notes = body?.notes ? String(body.notes) : null;
+    const phone = body?.phone ? String(body.phone) : null;
+    const ownerStatus = body?.ownerStatus ? String(body.ownerStatus) : null;
+    const operatorInfo = body?.operatorInfo ? String(body.operatorInfo) : null;
+    const offerAmount = body?.offerAmount ? String(body.offerAmount) : null;
+    const urgency = body?.urgency ? String(body.urgency) : null;
+    const intent = body?.intent ? String(body.intent) : null;
     const attribution = extractAttribution(body);
+
+    const optionalFields = {
+      phone,
+      owner_status: ownerStatus,
+      operator_info: operatorInfo,
+      offer_amount: offerAmount,
+      urgency,
+      intent,
+    };
 
     if (supabaseEnabled) {
       try {
@@ -80,6 +101,7 @@ export default async (req) => {
           producing_status: producingStatus,
           documents,
           notes,
+          ...optionalFields,
           ...attribution,
         });
         await notify(row);
@@ -99,6 +121,7 @@ export default async (req) => {
       producing_status: producingStatus,
       documents,
       notes,
+      ...optionalFields,
       ...attribution,
       created_at: new Date().toISOString(),
     };

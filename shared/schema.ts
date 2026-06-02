@@ -24,13 +24,24 @@ export const reviewRequests = sqliteTable("review_requests", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   email: text("email").notNull(),
+  phone: text("phone"),
   state: text("state").notNull(),
   county: text("county"),
   // "producing" | "not_producing" | "not_sure"
   producingStatus: text("producing_status").notNull(),
+  // "heir" | "current_owner" | "executor" | "not_sure"
+  ownerStatus: text("owner_status"),
+  // Operator name and/or royalty check details (free text).
+  operatorInfo: text("operator_info"),
+  // Offer amount if the owner has already received one (free text, e.g. "$25,000").
+  offerAmount: text("offer_amount"),
+  // "exploring" | "within_3_months" | "ready_now" | "just_curious"
+  urgency: text("urgency"),
   // JSON string array of available documents
   documents: text("documents").notNull().default("[]"),
   notes: text("notes"),
+  // Which landing intent the request came from (inherited | offer | value | general).
+  intent: text("intent"),
   createdAt: integer("created_at").notNull(),
 });
 
@@ -39,11 +50,17 @@ export const insertReviewRequestSchema = createInsertSchema(reviewRequests)
   .extend({
     name: z.string().min(2, "Please enter your name"),
     email: z.string().email("Please enter a valid email"),
+    phone: z.string().max(40).optional(),
     state: z.string().min(2, "Please select a state"),
-    county: z.string().optional(),
+    county: z.string().max(80).optional(),
     producingStatus: z.enum(["producing", "not_producing", "not_sure"]),
+    ownerStatus: z.enum(["heir", "current_owner", "executor", "not_sure"]).optional(),
+    operatorInfo: z.string().max(300).optional(),
+    offerAmount: z.string().max(60).optional(),
+    urgency: z.enum(["exploring", "within_3_months", "ready_now", "just_curious"]).optional(),
     documents: z.array(z.string()).default([]),
     notes: z.string().max(2000).optional(),
+    intent: z.string().max(40).optional(),
     // Explicit agreement to the privacy/terms before we review their details.
     consent: z.literal(true, {
       errorMap: () => ({ message: "Please agree before submitting" }),
