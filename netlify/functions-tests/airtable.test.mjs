@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { mapLeadToAirtableFields } from "./_shared.mjs";
+import { mapLeadToAirtableFields } from "../functions/_shared.mjs";
 
 describe("mapLeadToAirtableFields", () => {
   it("maps a full landing-form lead to the Leads table fields", () => {

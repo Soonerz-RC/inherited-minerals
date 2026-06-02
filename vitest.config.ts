@@ -14,7 +14,10 @@ export default defineConfig({
     include: [
       "client/src/**/*.test.ts",
       "client/src/**/*.test.tsx",
-      "netlify/**/*.test.mjs",
+      // Tests live in netlify/functions-tests (NOT netlify/functions) because
+      // Netlify deploys every file under the functions dir and rejects dotted
+      // names like `foo.test.mjs`.
+      "netlify/functions-tests/**/*.test.mjs",
     ],
   },
 });

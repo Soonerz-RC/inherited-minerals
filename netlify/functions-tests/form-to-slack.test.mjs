@@ -14,7 +14,7 @@ async function loadHandler(env = {}) {
     if (v === undefined) delete process.env[k];
     else process.env[k] = v;
   }
-  const mod = await import("./form-to-slack.mjs");
+  const mod = await import("../functions/form-to-slack.mjs");
   return mod.default;
 }
 
