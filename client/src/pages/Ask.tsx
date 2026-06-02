@@ -8,6 +8,8 @@ import { Send, Sparkles, ShieldAlert, BookOpen, ArrowRight, MessageCircleQuestio
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { PageShell } from "@/components/SiteLayout";
+import { PhoneCTA } from "@/components/PhoneCTA";
+import { DISPLAY_PHONE_NUMBER } from "@/lib/analytics";
 import { LogoMark } from "@/components/Logo";
 import { AssistantHandoff } from "@/components/AssistantHandoff";
 import { usePageMeta } from "@/hooks/use-page-meta";
@@ -177,6 +179,12 @@ export default function Ask() {
             confirm specifics with a qualified attorney or CPA before deciding.
           </p>
         </div>
+
+        {DISPLAY_PHONE_NUMBER && (
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            Prefer to talk it through? <PhoneCTA location="ask" className="ml-1" />
+          </p>
+        )}
 
         {/* Suggested prompts (Phase 1 guided topics) */}
         <div className="mt-6">

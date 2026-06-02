@@ -202,20 +202,25 @@ function questionsFromNotes(notes) {
  * Map a flattened lead `data` object (canonical keys plus tolerated aliases)
  * into the Airtable Leads table's field shape. All table fields are
  * multilineText, so every value is coerced to a string. `slackPosted` records
- * whether the Slack notification succeeded. Pure and side-effect-free so it can
- * be unit-tested independently of any network call.
+ * whether the Slack notification succeeded. `source` and `priority` override the
+ * derived/default values for those columns when a caller already knows them
+ * (e.g. phone leads are always Source=Phone with a computed Priority). Pure and
+ * side-effect-free so it can be unit-tested independently of any network call.
  */
-export function mapLeadToAirtableFields(data = {}, { slackPosted = false } = {}) {
+export function mapLeadToAirtableFields(
+  data = {},
+  { slackPosted = false, source = null, priority = null } = {},
+) {
   const d = data || {};
   const notes = pick(d.notes, d.message, d.body, d.comments, d.Notes);
   const fields = {
     "Lead name": pick(d.name, d["Lead name"], d.lead_name, d.full_name, d.fullName),
     Email: pick(d.email, d.Email),
     Phone: pick(d.phone, d.phone_number, d.phoneNumber, d.Phone),
-    Source: deriveSource(d),
+    Source: source || deriveSource(d),
     Intent: pick(d.intent, d.Intent),
     Status: "New",
-    Priority: "Medium",
+    Priority: priority || "Medium",
     State: pick(d.state, d.State),
     County: pick(d.county, d.County),
     "Operator / Royalty Info": pick(

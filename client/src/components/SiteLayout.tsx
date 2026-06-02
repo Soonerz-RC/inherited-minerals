@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Logo } from "./Logo";
 import { Button } from "@/components/ui/button";
+import { PhoneCTA } from "@/components/PhoneCTA";
+import { DISPLAY_PHONE_NUMBER } from "@/lib/analytics";
 import { Menu, X, ShieldCheck } from "lucide-react";
 
 const NAV = [
@@ -39,6 +41,9 @@ export function SiteHeader() {
               </Link>
             );
           })}
+          {DISPLAY_PHONE_NUMBER && (
+            <PhoneCTA location="header" className="ml-2 text-sm" />
+          )}
           <Link href="/sell" className="ml-2">
             <Button data-testid="button-header-cta" className="font-medium">
               Request a private review
@@ -75,6 +80,9 @@ export function SiteHeader() {
                 Request a private review
               </Button>
             </Link>
+            {DISPLAY_PHONE_NUMBER && (
+              <PhoneCTA location="mobile-menu" className="mt-3 justify-center px-3 py-3 text-base" />
+            )}
           </nav>
         </div>
       )}
@@ -93,6 +101,16 @@ export function SiteFooter() {
               Plain-English help for people who inherited oil and gas mineral
               rights. Understand what you own before you make any decision.
             </p>
+            {DISPLAY_PHONE_NUMBER && (
+              <div className="mt-5">
+                <p className="text-sm font-semibold text-foreground">Prefer to talk it through?</p>
+                <PhoneCTA location="footer" className="mt-1.5" />
+                <p className="mt-2 max-w-xs text-xs leading-relaxed text-muted-foreground">
+                  Calls are for general intake and education only — not legal,
+                  tax, or financial advice.
+                </p>
+              </div>
+            )}
           </div>
 
           <div>

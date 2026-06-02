@@ -23,7 +23,13 @@ export const GOOGLE_ADS_REVIEW_LABEL = (env.VITE_GOOGLE_ADS_REVIEW_CONVERSION_LA
 export const GOOGLE_ADS_QUESTION_LABEL = (env.VITE_GOOGLE_ADS_QUESTION_CONVERSION_LABEL ?? "").trim();
 export const META_PIXEL_ID = (env.VITE_META_PIXEL_ID ?? "").trim();
 
-export const PUBLIC_PHONE_NUMBER = (env.VITE_PUBLIC_PHONE_NUMBER ?? "").trim();
+// The live business line, answered by the Bland.ai intake assistant. Falls back
+// to this production number when VITE_PUBLIC_PHONE_NUMBER is unset so the CTAs
+// ship on by default; set the env var to override (e.g. a different market).
+const DEFAULT_PUBLIC_PHONE_NUMBER = "(405) 450-8680";
+
+export const PUBLIC_PHONE_NUMBER =
+  (env.VITE_PUBLIC_PHONE_NUMBER ?? "").trim() || DEFAULT_PUBLIC_PHONE_NUMBER;
 export const CALL_TRACKING_NUMBER = (env.VITE_CALL_TRACKING_NUMBER ?? "").trim();
 
 // The number a visitor should actually dial: prefer a call-tracking DID if set,

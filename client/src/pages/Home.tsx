@@ -12,6 +12,8 @@ import {
   HandCoins,
 } from "lucide-react";
 import { PageShell } from "@/components/SiteLayout";
+import { PhoneCTA } from "@/components/PhoneCTA";
+import { DISPLAY_PHONE_NUMBER } from "@/lib/analytics";
 import { LogoMark } from "@/components/Logo";
 import {
   SITUATIONS,
@@ -375,6 +377,17 @@ export default function Home() {
               </Button>
             </Link>
           </div>
+          {DISPLAY_PHONE_NUMBER && (
+            <div className="mt-8 border-t border-border/60 pt-6">
+              <p className="text-muted-foreground">
+                Prefer to talk it through? <PhoneCTA location="home-final-cta" className="ml-1" />
+              </p>
+              <p className="mx-auto mt-2 max-w-md text-xs text-muted-foreground">
+                Calls are for general intake and education only — not legal, tax,
+                or financial advice.
+              </p>
+            </div>
+          )}
         </Card>
       </section>
     </PageShell>

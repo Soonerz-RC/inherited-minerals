@@ -71,13 +71,22 @@ account part in `VITE_GOOGLE_ADS_ID` and the label part in the matching
 
 | Env var | Purpose |
 | --- | --- |
-| `VITE_PUBLIC_PHONE_NUMBER` | Business phone number shown in click-to-call CTAs. |
+| `VITE_PUBLIC_PHONE_NUMBER` | Business phone number shown in click-to-call CTAs. **Defaults to the live Bland.ai intake line `(405) 450-8680`** when unset. |
 | `VITE_CALL_TRACKING_NUMBER` | Optional. When set, this number is displayed/dialed instead (for a call-tracking provider DID). |
 
-The `PhoneCTA` component (`client/src/components/PhoneCTA.tsx`) renders nothing
-unless a number is configured, and tags every click as a `phone_click` event
-(GA4) and `Contact` (Meta). It appears on the landing pages and the review
-thank-you page.
+The site's public phone number is **`(405) 450-8680`** (`tel:+14054508680`),
+the line answered by the Bland.ai intake assistant (see
+[section 3b](#3b-blandai-phone-leads-netlify-function--sl--airtable)). It is the
+default for `VITE_PUBLIC_PHONE_NUMBER`, so the click-to-call CTAs ship **on** by
+default; set the env var to override it (e.g. a different market or a temporary
+number), or set `VITE_CALL_TRACKING_NUMBER` to dial a call-tracking DID instead.
+
+The `PhoneCTA` component (`client/src/components/PhoneCTA.tsx`) renders a
+`tel:` link and tags every click as a `phone_click` event (GA4) and `Contact`
+(Meta). It appears in the site header and footer, the homepage hero/final CTA,
+the assistant page (`/#/ask`), all three ad landing pages, and the review
+thank-you page. CTAs near the phone note that calls are for general
+intake/education only — not legal, tax, or financial advice.
 
 ---
 
@@ -212,7 +221,105 @@ true, ok: false } }`.
 from the assistant summary's "— Questions asked —" bullets), `Landing Page`,
 `UTM Source/Medium/Campaign`, `Submitted At` (payload value or current ISO
 timestamp), and `Slack Posted` (`true` when the Slack post succeeded). Empty
-values are omitted rather than written as blanks.
+values are omitted rather than written as blanks. (`Source` and `Priority`
+accept caller overrides — used by the Bland phone-lead path below — but
+`form-to-slack` keeps the derived `Source` and `Priority: Medium`.)
+
+### 3b. Bland.ai phone leads (Netlify Function → Slack + Airtable)
+
+Inbound phone calls are handled by a **Bland.ai** conversational agent that
+qualifies the caller, then fires a **post-call webhook** to a dedicated Netlify
+Function. That function turns the call into a lead and delivers it to the **same
+Slack channel and Airtable table** as the website forms, so phone and web leads
+live side by side.
+
+| Item | Value |
+| --- | --- |
+| Public phone number | **(405) 450-8680** / `+14054508680` |
+| Bland pathway | **Inherited Mineral Rights Intake Pathway** (Gib's Personal Org) |
+| Pathway ID | `62281a68-8c95-4e77-92bb-64a767d89979` (version `569793`) |
+| Webhook URL (prod) | `https://www.inheritedmineralrights.com/.netlify/functions/bland-call-lead` |
+| Webhook URL (alias) | `https://www.inheritedmineralrights.com/api/bland-call-lead` |
+| Function | `netlify/functions/bland-call-lead.mjs` |
+
+**Env vars** — the endpoint reuses the existing lead infrastructure; no new lead
+credentials are required:
+
+| Variable | Required | Notes |
+|---|---|---|
+| `SLACK_WEBHOOK_URL` | **Yes** | Same webhook `form-to-slack` uses. Without it the function returns HTTP 500. |
+| `AIRTABLE_PAT` (+ `AIRTABLE_BASE_ID`/`AIRTABLE_TABLE_ID`) | No | Same Airtable backup vars as above. When unset, the Slack post still succeeds and the response reports `airtable.configured: false`. |
+| `BLAND_WEBHOOK_SECRET` | No | **Optional/disabled by default.** When set, requests must present the value via the `x-bland-secret` (or `x-webhook-secret`) header or a `?secret=` query param, else the function returns HTTP 401. Leave unset so initial setup works without extra config. |
+
+**Setup:**
+
+1. In the Bland pathway above, set the **post-call webhook** to the prod URL.
+2. Add `SLACK_WEBHOOK_URL` (already set for `form-to-slack`) in Netlify if it is
+   not present. Optionally add `AIRTABLE_PAT` for the durable backup.
+3. (Optional) Set `BLAND_WEBHOOK_SECRET` in Netlify **and** configure Bland to
+   send the matching `x-bland-secret` header (or append `?secret=...` to the URL)
+   once you want to lock the endpoint down.
+
+**Payload tolerance.** The function does not assume an exact Bland shape. It
+reads top-level fields plus anything nested under `variables`, `pathway_variables`,
+`metadata`, or `data` (top-level wins), and tolerates JSON or urlencoded bodies.
+Recognized fields include `call_id`/`c_id`, `from`/`to`/`phone_number`,
+`transcript`, `summary`, `analysis`, `recording_url`, `call_length`, `status`,
+`disposition`, `started_at`/`ended_at`, and pathway variables like
+`primary_intent`, `full_name`, `email`, `mineral_state`, `mineral_county`,
+`offer_amount`, `operator_info`, `ownership_status`, `royalty_check_status`, and
+`questions_asked`.
+
+**Lead mapping** (call → Leads table): `form_name=phone-lead`, `Source=Phone`,
+`Intent` (primary_intent/intent, else `Other`), `Lead name`
+(full_name/name/caller_name, else `Caller <phone>`), `Phone`
+(callback_phone/from), `Email`, `State` (mineral_state), `County`
+(mineral_county), `Operator / Royalty Info` (operator_info), `Offer Amount`,
+`Producing Status` (royalty_check_status), `Owner Status` (ownership_status),
+`Notes` (call summary + key variables + recording/call-id links), `Questions
+Asked` (questions/main reason/primary intent), `Landing Page`
+(`https://www.inheritedmineralrights.com/` or a provided URL), `UTM
+Source=phone` / `Medium=call` / `Campaign=inherited_minerals_phone`, `Submitted
+At` (ended_at/started_at, else current ISO), `Slack Posted` (`true` on success),
+and **`Priority`** — `High` when the call shows an offer amount, sell intent, a
+deadline/urgency, or producing/royalty-check status, otherwise `Medium`.
+
+The Slack message is headed **"New phone lead — Inherited Mineral Rights"** and
+includes caller, phone, email, intent, state/county, offer amount, the call
+summary, the recording/transcript link (when present), and the call id.
+
+**Testing:**
+
+- **Unit tests:** `npm test` runs `netlify/functions-tests/bland-call-lead.test.mjs`,
+  covering payload normalization (nested variables, aliases, sparse/anonymous
+  calls), priority derivation, the Slack/Airtable flow, the 405/500/502 paths,
+  the no-token path, urlencoded bodies, and the optional secret.
+- **Live smoke test** (after deploy) — send a sample post-call payload and
+  confirm it lands in Slack `#inherited` (and Airtable if configured):
+
+  ```bash
+  curl -sS -X POST \
+    https://www.inheritedmineralrights.com/.netlify/functions/bland-call-lead \
+    -H 'content-type: application/json' \
+    -d '{
+      "call_id": "TEST-call-001",
+      "from": "+14055551234",
+      "to": "+14054508680",
+      "status": "completed",
+      "summary": "Perplexity QA test — caller inherited minerals in Reeves County, TX.",
+      "variables": {
+        "primary_intent": "sell",
+        "full_name": "QA Test Caller",
+        "mineral_state": "Texas",
+        "mineral_county": "Reeves",
+        "offer_amount": "$25,000"
+      }
+    }'
+  ```
+
+  A `TEST`/`Perplexity QA` summary is flagged with a test marker in Slack so it
+  is visually distinct from real leads. Expect a `{ "ok": true, "form":
+  "phone-lead", "airtable": { ... } }` response.
 
 ### Later: migrate to a database (Neon/Supabase)
 
