@@ -108,6 +108,12 @@ export interface AssistantResponse {
   reply: string;
   // suggested next questions
   suggestions: string[];
-  // always true in v1 — content is educational, not advice
+  // always present — content is educational, not advice
   disclaimer: string;
+  // recommended/cited Learning Center articles (Phase 2 grounding)
+  articles?: { slug: string; title: string; url: string }[];
+  // a conversion CTA the UI can surface
+  cta?: { route: string; label: string };
+  // "ai" when answered by the model, "fallback" when keyless/degraded
+  mode?: "ai" | "fallback";
 }
