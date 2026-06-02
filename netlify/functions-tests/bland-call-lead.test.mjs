@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { normalizeBlandCall } from "../functions/bland-call-lead.mjs";
+import { normalizeBlandCall, isSubstantiveCall } from "../functions/bland-call-lead.mjs";
 
 const SLACK_URL = "https://hooks.slack.test/webhook";
 const AIRTABLE_HOST = "api.airtable.com";
@@ -50,6 +50,50 @@ const BLAND_PAYLOAD = {
     questions_asked: "Is the offer fair?",
   },
 };
+
+// A sparse/interim Bland event like the ones that created duplicate leads:
+// only a call id and the from/to numbers, no summary or collected variables.
+const SPARSE_PAYLOAD = {
+  call_id: "ca362365-4067-455a-b2bb-9c9290bf73dc",
+  from: "+14055551234",
+  to: "+14054508680",
+  timestamp: "2026-06-02T18:29:00.000Z",
+};
+
+describe("isSubstantiveCall", () => {
+  it("ignores a sparse interim event with only call id + numbers + timestamp", () => {
+    const result = isSubstantiveCall(SPARSE_PAYLOAD);
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBeTruthy();
+  });
+
+  it("accepts the good completed payload", () => {
+    expect(isSubstantiveCall(BLAND_PAYLOAD).ok).toBe(true);
+  });
+
+  it("accepts an event that only has a summary", () => {
+    expect(isSubstantiveCall({ call_id: "x", summary: "Caller wants to sell." }).ok).toBe(true);
+  });
+
+  it("accepts an event with a transcript and no summary", () => {
+    expect(isSubstantiveCall({ call_id: "x", transcript: "Agent: hello..." }).ok).toBe(true);
+  });
+
+  it("accepts an event with collected variables and no active status", () => {
+    expect(
+      isSubstantiveCall({ call_id: "x", from: "+14055550000", variables: { full_name: "Jim Payload" } }).ok,
+    ).toBe(true);
+  });
+
+  it("ignores an event whose only variable is present but status is in-progress", () => {
+    const result = isSubstantiveCall({
+      call_id: "x",
+      status: "in-progress",
+      variables: { full_name: "Jim Payload" },
+    });
+    expect(result.ok).toBe(false);
+  });
+});
 
 describe("normalizeBlandCall", () => {
   it("maps nested variables and top-level call fields into the lead shape", () => {
@@ -160,6 +204,31 @@ describe("bland-call-lead handler", () => {
     expect(sent.fields.Priority).toBe("High");
     expect(sent.fields["Slack Posted"]).toBe("true");
     expect(sent.fields["UTM Campaign"]).toBe("inherited_minerals_phone");
+  });
+
+  it("ignores a sparse interim event without posting to Slack or Airtable", async () => {
+    fetchMock.mockResolvedValue(new Response("ok", { status: 200 }));
+    const handler = await loadHandler({ AIRTABLE_PAT: "pat_test_token" });
+    const res = await handler(makeReq(SPARSE_PAYLOAD));
+    const out = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(out).toMatchObject({ ok: true, ignored: true });
+    expect(out.reason).toBeTruthy();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("ignores an in-progress event even when it carries a collected variable", async () => {
+    fetchMock.mockResolvedValue(new Response("ok", { status: 200 }));
+    const handler = await loadHandler({ AIRTABLE_PAT: "pat_test_token" });
+    const res = await handler(
+      makeReq({ call_id: "ca-active", status: "in-progress", variables: { full_name: "Jim Payload" } }),
+    );
+    const out = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(out).toMatchObject({ ok: true, ignored: true });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("returns 405 for non-POST", async () => {
