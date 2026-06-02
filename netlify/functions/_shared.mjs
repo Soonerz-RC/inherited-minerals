@@ -8,9 +8,11 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 const LEAD_NOTIFY_EMAIL = process.env.LEAD_NOTIFY_EMAIL || "";
 const LEAD_FROM_EMAIL = process.env.LEAD_FROM_EMAIL || "Inherited Minerals <onboarding@resend.dev>";
+const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL || "";
 
 export const supabaseEnabled = Boolean(SUPABASE_URL && SUPABASE_KEY);
 export const resendEnabled = Boolean(RESEND_API_KEY && LEAD_NOTIFY_EMAIL);
+export const slackEnabled = Boolean(SLACK_WEBHOOK_URL);
 
 export function json(payload, status = 200) {
   return new Response(JSON.stringify(payload), {
@@ -90,4 +92,60 @@ export function escapeHtml(value) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+const TEST_MARKERS = [/\bTEST\b/i, /perplexity\s*qa/i];
+
+function slackStr(v) {
+  if (v == null) return null;
+  const s = String(v).trim();
+  return s === "" ? null : s.slice(0, 1500);
+}
+
+/**
+ * Build a Slack message (text + blocks) for a lead. `fields` is an ordered list
+ * of [label, value] pairs; empty values are skipped. `title` heads the message;
+ * a `:test_tube:` marker is used when the lead looks like a QA test so real and
+ * test leads are visually distinct in #inherited.
+ */
+export function buildLeadSlackMessage({ title, fields, meta }) {
+  const haystack = fields.map(([, v]) => v).join(" ");
+  const isTest = TEST_MARKERS.some((re) => re.test(haystack));
+  const header = isTest ? `:test_tube: TEST ${title}` : `:bell: ${title}`;
+
+  const lines = [];
+  for (const [label, value] of fields) {
+    const v = slackStr(value);
+    if (v) lines.push(`*${label}:* ${v}`);
+  }
+  if (lines.length === 0) lines.push("_No recognized fields in submission._");
+  if (meta) lines.push(`\n_${meta}_`);
+
+  return {
+    text: `${header}\n${lines.join("\n")}`,
+    blocks: [
+      { type: "header", text: { type: "plain_text", text: header.replace(/:[a-z_]+:\s*/i, ""), emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: lines.join("\n") } },
+    ],
+  };
+}
+
+/**
+ * POST a message to the configured Slack Incoming Webhook. Throws on failure so
+ * the caller can surface an error to the client (and avoid showing a false
+ * success). No-ops by throwing a clear error when the webhook isn't configured.
+ */
+export async function postToSlack(message) {
+  if (!slackEnabled) {
+    throw new Error("SLACK_WEBHOOK_URL is not configured");
+  }
+  const res = await fetch(SLACK_WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(message),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(`Slack post failed (${res.status}): ${detail.slice(0, 200)}`);
+  }
 }

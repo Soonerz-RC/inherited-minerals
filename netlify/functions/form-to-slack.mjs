@@ -5,7 +5,7 @@
 // notification → Outgoing webhook, pointing at /.netlify/functions/form-to-slack
 // (or /api/form-to-slack).
 
-import { json } from "./_shared.mjs";
+import { json, buildLeadSlackMessage, postToSlack, slackEnabled } from "./_shared.mjs";
 
 // Fields we surface in the Slack message, in display order. Each entry maps a
 // canonical key to a human label; values are pulled from the (flattened) form
@@ -49,8 +49,6 @@ const ALIASES = {
   sourcePage: "source_page",
   landingPage: "landing_page",
 };
-
-const TEST_MARKERS = [/\bTEST\b/i, /perplexity\s*qa/i];
 
 function str(v) {
   if (v == null) return null;
@@ -118,38 +116,16 @@ function normalize(body) {
   return { formName, submittedAt, submissionId, fields };
 }
 
-function isTestLead(fields) {
-  const haystack = `${fields.name || ""} ${fields.notes || ""}`;
-  return TEST_MARKERS.some((re) => re.test(haystack));
-}
-
 function buildSlackMessage({ formName, submittedAt, submissionId, fields }) {
-  const test = isTestLead(fields);
-  const header = test
-    ? `:test_tube: TEST lead — ${formName}`
-    : `:bell: New lead — ${formName}`;
-
-  const lines = [];
-  for (const [key, label] of FIELD_LABELS) {
-    const value = fields[key];
-    if (value) lines.push(`*${label}:* ${value}`);
-  }
-  if (lines.length === 0) lines.push("_No recognized fields in submission._");
-
   const meta = [];
   if (submittedAt) meta.push(`Submitted: ${submittedAt}`);
   if (submissionId) meta.push(`ID: ${submissionId}`);
-  if (meta.length) lines.push(`\n_${meta.join(" · ")}_`);
 
-  const text = `${header}\n${lines.join("\n")}`;
-
-  return {
-    text,
-    blocks: [
-      { type: "header", text: { type: "plain_text", text: header.replace(/:[a-z_]+:\s*/i, ""), emoji: true } },
-      { type: "section", text: { type: "mrkdwn", text: lines.join("\n") } },
-    ],
-  };
+  return buildLeadSlackMessage({
+    title: `New lead — ${formName}`,
+    fields: FIELD_LABELS.map(([key, label]) => [label, fields[key]]),
+    meta: meta.length ? meta.join(" · ") : null,
+  });
 }
 
 export default async (req) => {
@@ -157,8 +133,7 @@ export default async (req) => {
     return json({ message: "Method not allowed" }, 405);
   }
 
-  const webhookUrl = process.env.SLACK_WEBHOOK_URL;
-  if (!webhookUrl) {
+  if (!slackEnabled) {
     console.error("form-to-slack: SLACK_WEBHOOK_URL is not configured");
     return json(
       { message: "Slack webhook is not configured on the server." },
@@ -176,21 +151,11 @@ export default async (req) => {
 
   console.log(
     `form-to-slack: posting lead for form="${normalized.formName}"` +
-      (normalized.submissionId ? ` id="${normalized.submissionId}"` : "") +
-      (isTestLead(normalized.fields) ? " [TEST]" : ""),
+      (normalized.submissionId ? ` id="${normalized.submissionId}"` : ""),
   );
 
   try {
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(message),
-    });
-    if (!res.ok) {
-      const detail = await res.text().catch(() => "");
-      console.error(`form-to-slack: Slack post failed (${res.status}): ${detail.slice(0, 200)}`);
-      return json({ message: "Failed to deliver Slack notification." }, 502);
-    }
+    await postToSlack(message);
   } catch (err) {
     console.error("form-to-slack: Slack post error:", err.message);
     return json({ message: "Failed to deliver Slack notification." }, 502);

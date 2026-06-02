@@ -11,6 +11,10 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
-    include: ["client/src/**/*.test.ts", "client/src/**/*.test.tsx"],
+    include: [
+      "client/src/**/*.test.ts",
+      "client/src/**/*.test.tsx",
+      "netlify/**/*.test.mjs",
+    ],
   },
 });

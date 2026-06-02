@@ -88,6 +88,21 @@ export async function submitReviewRequest(
 }
 
 /**
+ * Submit an assistant handoff lead. Unlike the landing-page forms, this always
+ * POSTs JSON to the dedicated `/api/assistant-lead` Netlify Function, which
+ * delivers the lead to Slack (#inherited) directly and records it via email /
+ * Supabase when configured. Netlify Forms could not be reliably triggered from
+ * the SPA assistant flow (the POST to "/" was swallowed by the SPA fallback
+ * redirect), so assistant leads bypass Netlify Forms. `apiRequest` throws on a
+ * non-2xx response, so callers only see success when the lead truly went out.
+ */
+export async function submitAssistantLead(
+  data: Record<string, unknown>,
+): Promise<void> {
+  await apiRequest("POST", "/api/assistant-lead", data);
+}
+
+/**
  * Submit a community question. Routes to Netlify Forms by default, or to the API
  * function when VITE_LEAD_BACKEND=api.
  */

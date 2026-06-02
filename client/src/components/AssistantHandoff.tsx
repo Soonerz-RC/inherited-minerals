@@ -15,7 +15,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { US_STATES } from "@/components/LeadForm";
-import { submitReviewRequest } from "@/lib/leads";
+import { submitAssistantLead } from "@/lib/leads";
 import {
   type IntakeState,
   PRODUCING_OPTIONS,
@@ -34,9 +34,12 @@ interface Props {
 
 /**
  * Phase 3 — structured guided intake + "send this summary for review" handoff.
- * Submits to the existing `private-review-request` Netlify Form (source of
- * record), which in turn fires the Slack outgoing webhook. On success it routes
- * to /thank-you/review so the existing conversion tracking still fires.
+ * Submits JSON to the `/api/assistant-lead` Netlify Function, which delivers the
+ * lead to Slack (#inherited) directly and records it via email/Supabase when
+ * configured. Assistant leads bypass Netlify Forms because the SPA POST to "/"
+ * was swallowed by the SPA fallback redirect and never recorded. Routes to
+ * /thank-you/review only after the function confirms delivery, so the existing
+ * conversion tracking fires only on a real success.
  */
 export function AssistantHandoff({ intake, setIntake, transcript }: Props) {
   const { toast } = useToast();
@@ -51,8 +54,10 @@ export function AssistantHandoff({ intake, setIntake, transcript }: Props) {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      await submitReviewRequest(buildHandoffPayload({ name, email, phone, intake, transcript }));
+      await submitAssistantLead(buildHandoffPayload({ name, email, phone, intake, transcript }));
     },
+    // Only route to the thank-you/conversion page once the server confirms the
+    // lead was delivered (apiRequest throws on non-2xx, so this runs on success).
     onSuccess: () => navigate("/thank-you/review"),
     onError: (e: Error) =>
       toast({

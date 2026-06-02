@@ -92,6 +92,17 @@ the dashboard, with no database, no env vars, and no secrets to manage.
 | `private-review-request` | Private review form (`/#/sell`) |
 | `community-question` | Community Q&A form (`/#/community`) |
 
+> **Assistant handoff is the exception — it does NOT use Netlify Forms.** The
+> `/#/ask` "send this summary for review" handoff POSTs JSON directly to the
+> `/api/assistant-lead` Netlify Function (`netlify/functions/assistant-lead.mjs`),
+> which delivers the lead to Slack `#inherited` via `SLACK_WEBHOOK_URL` and sends
+> the email / Supabase row when those are configured. Netlify Forms could not be
+> reliably triggered from the SPA assistant flow (the AJAX POST to `/` was
+> swallowed by the SPA fallback redirect and silently not recorded), so assistant
+> leads bypass Netlify Forms and will **not** appear under **Site → Forms**.
+> Requires only `SLACK_WEBHOOK_URL` (already used by `form-to-slack`); the client
+> shows the thank-you/conversion page only after the function returns success.
+
 Each submission includes the form's own fields plus the attribution fields
 (`source_page`, `landing_page`, `referrer`, `utm_source`, `utm_medium`,
 `utm_campaign`, `utm_content`, `utm_term`). The review form also records an
