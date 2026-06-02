@@ -34,6 +34,11 @@
       a matching `form-name` (see client/src/lib/leads.ts). These elements are
       hidden and never submitted by users — they exist only so Netlify knows the
       form names and field set. Keep the field names in sync with leads.ts.
+
+      `private-review-request` is shared by both the LeadForm component AND the
+      AssistantHandoff "send this summary for review" flow (intent=assistant),
+      so this stub must declare every field either of them submits. The
+      assistant folds its transcript + structured intake into `notes`.
     -->
     <form name="private-review-request" netlify netlify-honeypot="bot-field" hidden>
       <input type="text" name="name" />

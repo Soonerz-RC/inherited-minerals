@@ -4,6 +4,7 @@
 // help with no backend at all. The AI chat (Phase 2) layers on top of this.
 
 import { articles as LEARN_ARTICLES, type CtaKind } from "@/lib/learn";
+import { getAttribution } from "@/lib/attribution";
 
 export interface RelatedArticle {
   slug: string;
@@ -261,4 +262,52 @@ export function buildAssistantSummary(
   }
 
   return lines.join("\n").slice(0, 1900);
+}
+
+export interface HandoffInput {
+  name: string;
+  email: string;
+  phone: string;
+  intake: IntakeState;
+  transcript: { role: "user" | "assistant"; text: string }[];
+}
+
+/**
+ * Build the flat field map submitted to the `private-review-request` Netlify
+ * Form for an assistant handoff. Field names mirror the working LeadForm so
+ * Netlify (which registered the form from client/index.html) captures every
+ * value and fires its email + Slack notifications. The assistant transcript and
+ * structured intake are folded into `notes` (the assistant summary). Pure and
+ * side-effect-free apart from reading live attribution, so it is unit-testable.
+ */
+export function buildHandoffPayload({
+  name,
+  email,
+  phone,
+  intake,
+  transcript,
+}: HandoffInput): Record<string, unknown> {
+  const intent = goalToIntent(intake.goal);
+  const assistantSummary = buildAssistantSummary(intake, transcript);
+  const attribution = getAttribution();
+  return {
+    name,
+    email,
+    phone,
+    state: intake.state,
+    county: intake.county,
+    producingStatus: intake.producingStatus || "not_sure",
+    ownerStatus: intake.ownerStatus || "",
+    operatorInfo: intake.operatorInfo,
+    offerAmount: intake.offerAmount,
+    urgency: intake.goal === "sell" ? "exploring" : "",
+    documents: [],
+    notes: assistantSummary,
+    // `intent=assistant` flags the lead source; `goal`/attribution keep the
+    // marketing intent (inherited/offer/value) accurate for downstream reporting.
+    intent: "assistant",
+    consent: true,
+    ...attribution,
+    utm_content: attribution.utm_content ?? `assistant-${intent}`,
+  };
 }

@@ -15,15 +15,13 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { US_STATES } from "@/components/LeadForm";
-import { getAttribution } from "@/lib/attribution";
 import { submitReviewRequest } from "@/lib/leads";
 import {
   type IntakeState,
   PRODUCING_OPTIONS,
   OWNER_STATUS_OPTIONS,
   GOAL_OPTIONS,
-  goalToIntent,
-  buildAssistantSummary,
+  buildHandoffPayload,
 } from "@/lib/assistant";
 
 type Transcript = { role: "user" | "assistant"; text: string }[];
@@ -53,26 +51,7 @@ export function AssistantHandoff({ intake, setIntake, transcript }: Props) {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const intent = goalToIntent(intake.goal);
-      const assistantSummary = buildAssistantSummary(intake, transcript);
-      await submitReviewRequest({
-        name,
-        email,
-        phone,
-        state: intake.state,
-        county: intake.county,
-        producingStatus: intake.producingStatus || "not_sure",
-        ownerStatus: intake.ownerStatus || undefined,
-        operatorInfo: intake.operatorInfo,
-        offerAmount: intake.offerAmount,
-        urgency: intake.goal === "sell" ? "exploring" : undefined,
-        notes: assistantSummary,
-        intent: "assistant",
-        consent: true,
-        ...getAttribution(),
-        // keep attribution intent accurate for downstream reporting
-        utm_content: getAttribution().utm_content ?? `assistant-${intent}`,
-      });
+      await submitReviewRequest(buildHandoffPayload({ name, email, phone, intake, transcript }));
     },
     onSuccess: () => navigate("/thank-you/review"),
     onError: (e: Error) =>

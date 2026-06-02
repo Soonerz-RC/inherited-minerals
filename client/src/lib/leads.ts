@@ -25,19 +25,36 @@ const BACKEND: Backend =
     : "netlify-forms";
 
 // Netlify Forms expects application/x-www-form-urlencoded with every value as a
-// string. Arrays are joined; null/undefined become empty strings.
-function encodeForm(data: Record<string, unknown>): string {
+// string. Arrays are joined; null/undefined become empty strings. Exported for
+// unit testing of the submission payload.
+export function encodeForm(data: Record<string, unknown>): string {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(data)) {
     if (value == null) {
       params.append(key, "");
     } else if (Array.isArray(value)) {
       params.append(key, value.join(", "));
+    } else if (typeof value === "boolean") {
+      params.append(key, value ? "true" : "false");
     } else {
       params.append(key, String(value));
     }
   }
   return params.toString();
+}
+
+/**
+ * Build the exact urlencoded body Netlify Forms receives. Always includes the
+ * `form-name` (so Netlify routes the submission to the registered form and fires
+ * its email + outgoing-webhook notifications) and an empty `bot-field` honeypot
+ * (the registered forms declare `netlify-honeypot="bot-field"`; a present-but-
+ * empty value is the expected non-spam signal). Exported for unit testing.
+ */
+export function buildNetlifyFormBody(
+  formName: string,
+  data: Record<string, unknown>,
+): string {
+  return encodeForm({ "form-name": formName, "bot-field": "", ...data });
 }
 
 async function postToNetlifyForms(
@@ -47,7 +64,7 @@ async function postToNetlifyForms(
   const res = await fetch("/", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: encodeForm({ "form-name": formName, ...data }),
+    body: buildNetlifyFormBody(formName, data),
   });
   if (!res.ok) {
     throw new Error(
