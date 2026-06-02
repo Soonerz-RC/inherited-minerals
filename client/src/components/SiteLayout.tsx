@@ -6,6 +6,7 @@ import { Menu, X, ShieldCheck } from "lucide-react";
 
 const NAV = [
   { href: "/start-here", label: "Start Here" },
+  { href: "/learn", label: "Learning Center" },
   { href: "/ask", label: "Ask the Assistant" },
   { href: "/community", label: "Community Q&A" },
   { href: "/sell", label: "Sell or Value" },
@@ -98,6 +99,7 @@ export function SiteFooter() {
             <h2 className="text-sm font-semibold text-foreground">Learn</h2>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li><Link href="/start-here" className="hover:text-primary">Start Here guide</Link></li>
+              <li><Link href="/learn" className="hover:text-primary">Learning Center</Link></li>
               <li><Link href="/ask" className="hover:text-primary">Ask the assistant</Link></li>
               <li><Link href="/community" className="hover:text-primary">Community Q&A</Link></li>
             </ul>

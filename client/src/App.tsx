@@ -9,6 +9,8 @@ import { useLocation } from "wouter";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 import Home from "@/pages/Home";
 import StartHere from "@/pages/StartHere";
+import Learn from "@/pages/Learn";
+import LearnArticle from "@/pages/LearnArticle";
 import Ask from "@/pages/Ask";
 import Community from "@/pages/Community";
 import Sell from "@/pages/Sell";
@@ -40,6 +42,8 @@ function AppRouter() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/start-here" component={StartHere} />
+        <Route path="/learn" component={Learn} />
+        <Route path="/learn/:slug" component={LearnArticle} />
         <Route path="/ask" component={Ask} />
         <Route path="/community" component={Community} />
         <Route path="/sell" component={Sell} />
