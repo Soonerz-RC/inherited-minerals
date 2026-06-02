@@ -130,6 +130,31 @@ webhook notifications here.) This is independent of the optional Resend path in
 [section 4](#4-email-notifications-resend), which only applies when you move to
 the API/database backend.
 
+### Slack notifications (Netlify Function → Incoming Webhook)
+
+A server-side function posts a formatted lead alert to Slack on every form
+submission. Setup:
+
+1. In Slack, create an **Incoming Webhook** for the destination channel
+   (`#inherited`, channel ID `C0B7QBYMJ3U`). Copy the webhook URL.
+2. In Netlify: **Site settings → Environment variables**, add
+   `SLACK_WEBHOOK_URL` with that webhook URL. It is server-only and is **never**
+   exposed to the client — the function reads it from `process.env`.
+3. In Netlify: **Site → Forms → Form notifications → Add notification → Outgoing
+   webhook.** Set the URL to
+   `https://www.inheritedmineralrights.com/.netlify/functions/form-to-slack`
+   (or the equivalent `/api/form-to-slack`). Leave it unrestricted to cover both
+   `private-review-request` and `community-question`, or add one per form.
+
+The function (`netlify/functions/form-to-slack.mjs`) tolerates Netlify's
+`{ payload: { form_name, data } }` notification shape as well as flat JSON and
+urlencoded bodies. It surfaces name, email, phone, state, county, producing/owner
+status, operator, offer amount, urgency, intent, source/landing page, notes, and
+the submission timestamp/ID when present. Leads whose name or notes contain
+`TEST` or `Perplexity QA` are flagged with a test marker in the Slack message.
+If `SLACK_WEBHOOK_URL` is unset the function returns HTTP 500 without leaking any
+secret.
+
 ### Later: migrate to a database (Neon/Supabase)
 
 The Netlify Functions for a database-backed path are kept in `netlify/functions`
