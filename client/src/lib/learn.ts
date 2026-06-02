@@ -59,6 +59,8 @@ export const CATEGORIES = [
   "Taxes",
   "Valuation & Selling",
   "Estate Planning",
+  "Co-Ownership",
+  "Recovering Money",
 ] as const;
 
 export const LEARN_INTRO = {
@@ -1078,6 +1080,521 @@ export const articles: Article[] = [
       { label: "NARO — FAQ on mineral deeds and how they differ from leases", url: "https://www.naro-us.org/FAQ" },
     ],
     related: ["probate-mineral-rights-heirs", "reading-mineral-deed-explained", "what-are-inherited-mineral-rights"],
+  },
+
+  // ---------------------------------------------------------------------------
+  {
+    slug: "unclaimed-mineral-royalties-heirs",
+    category: "Recovering Money",
+    keyword: "unclaimed mineral royalties",
+    title: "When No One Can Find the Heir: Unclaimed Royalties and How to Claim Money That’s Been Waiting for You",
+    metaTitle: "Unclaimed Mineral Royalties for Heirs: How to Claim Them | Learning Center",
+    metaDescription:
+      "How heirs find and claim unclaimed or escheated oil and gas royalties: what happens when an owner can’t be found, where to search, the documentation states require, and getting back into pay status.",
+    summary:
+      "Royalty checks that went uncashed don’t disappear — they’re often held by the state. Here’s how to find and claim them.",
+    intro:
+      "When an oil company can’t locate a mineral owner who has died or moved, the royalty checks don’t vanish. After a waiting period, the operator turns the money over to the state, where it can sit for years — waiting for an heir who knows where to look.",
+    readingMinutes: 9,
+    topCta: { kind: "review", text: "Think there may be unclaimed royalties in your family’s name? Let’s help you find out." },
+    sections: [
+      {
+        heading: "What Happens to Royalties When a Mineral Owner Dies and Isn’t Found",
+        blocks: [
+          {
+            type: "p",
+            text: "When an operator can’t confirm who should be paid — because the owner died, moved, changed their name, or never updated their address — it can’t safely keep cutting checks. Instead it places the money in “suspense,” holding it until the rightful owner (or their heir) comes forward with proof of ownership.",
+          },
+          {
+            type: "p",
+            text: "Suspended funds are common after a death, because the operator usually needs evidence that title has passed before it can pay a new person. The money is still yours to claim; it’s just parked until the paperwork catches up.",
+          },
+        ],
+      },
+      {
+        heading: "Escheatment: How States Become the Temporary Custodian of Your Royalties",
+        blocks: [
+          {
+            type: "p",
+            text: "If suspended funds go unclaimed long enough — often one to five years depending on the state — the operator is legally required to hand them over to the state as “unclaimed property.” This handover is called escheatment. The state then becomes the custodian, holding the money (sometimes indefinitely) until an owner or heir claims it.",
+          },
+          {
+            type: "callout",
+            title: "Waiting periods vary",
+            text: "The dormancy period before funds escheat, and the rules for claiming them, differ from state to state. There is no single national timeline.",
+          },
+        ],
+      },
+      {
+        heading: "Where to Search: State Databases, MissingMoney.com, and the Delaware Angle",
+        blocks: [
+          {
+            type: "p",
+            text: "Start with the free, official tools. MissingMoney.com is a multi-state unclaimed-property search endorsed by state administrators, and Unclaimed.org (run by NAUPA) links to every state’s official unclaimed-property office. Search the deceased owner’s name, maiden names, prior addresses, and common misspellings.",
+          },
+          {
+            type: "p",
+            text: "Search every state where your family lived or owned minerals — not just your own. Many companies are incorporated in Delaware, and some unclaimed funds end up reported there, so it’s worth checking Delaware’s database even if your family never lived there.",
+          },
+          { type: "cta", cta: { kind: "review", text: "Found something in a database but not sure how to claim it as an heir? Request a private review." } },
+        ],
+      },
+      {
+        heading: "What Documentation You’ll Need to Claim as an Heir",
+        blocks: [
+          {
+            type: "p",
+            text: "Claiming in your own name is straightforward; claiming on behalf of a deceased relative is more involved. States typically want proof of the original owner’s identity and proof of your right to inherit — which can include a death certificate, a will or probate order, an affidavit of heirship, and identification.",
+          },
+          {
+            type: "bullets",
+            items: [
+              "Proof linking the deceased owner to the unclaimed property (name, last known address, Social Security number where available).",
+              "A death certificate for the original owner.",
+              "Documents establishing your inheritance — a probate order, letters testamentary, or in some states an affidavit of heirship.",
+              "Your own government-issued identification.",
+            ],
+          },
+          {
+            type: "callout",
+            title: "Larger claims, more proof",
+            text: "Some states require formal probate or court records for claims above a dollar threshold (Oklahoma, for example, has historically required more for claims over $10,000). Requirements vary, so confirm with the specific state office.",
+          },
+        ],
+      },
+      {
+        heading: "After the Claim: Getting Back Into “Pay Status” With the Current Operator",
+        blocks: [
+          {
+            type: "p",
+            text: "Recovering escheated money is only half the job. Those funds are usually past royalties already turned over to the state — but the well may still be producing. To receive future checks, you also need to get back into “pay status” with the current operator by establishing your ownership directly with them, which typically means completing title transfer and a new division order.",
+          },
+        ],
+      },
+      {
+        heading: "When Professional Help Makes Sense — and How to Avoid Overpaying for It",
+        blocks: [
+          {
+            type: "p",
+            text: "The official search and claim process is free, and for many heirs it’s entirely doable without help. Paid “finder” services exist, and some charge a large percentage of what they recover. Before signing with any finder, check whether you can claim the money yourself for free, and be cautious of contracts that take an outsized cut. If inheritance documentation is unclear or the amounts are significant, an attorney is often the better investment.",
+          },
+        ],
+      },
+    ],
+    guardrails: [
+      "State escheatment rules, waiting periods, and documentation requirements vary — there is no single universal process.",
+      "Some states require probate or court records for claims above a threshold dollar amount (Oklahoma noted as an example for claims over $10,000).",
+      "We don’t endorse any specific paid finder service; the official state search and claim process is free.",
+      "Heirs claiming under a deceased owner’s name will almost always need proof of inheritance — consult an attorney if documentation is unclear or amounts are significant.",
+    ],
+    sources: [
+      { label: "MissingMoney.com — national unclaimed property database (multi-state search)", url: "https://www.missingmoney.com" },
+      { label: "Unclaimed.org (NAUPA) — links to all state unclaimed property offices", url: "https://www.unclaimed.org" },
+      { label: "Mineral Rights Podcast — “How to Find Out if You Have Unclaimed Royalties”", url: "https://mineralrightspodcast.com/mrp-103-how-to-find-if-you-have-unclaimed-royalties/" },
+      { label: "Blue Mesa Minerals — Finding Unclaimed Mineral Rights", url: "https://bluemesaminerals.com/finding-unclaimed-mineral-rights/" },
+    ],
+    related: ["probate-mineral-rights-heirs", "royalty-check-explained", "mineral-rights-heir-mistakes"],
+  },
+
+  // ---------------------------------------------------------------------------
+  {
+    slug: "co-tenancy-undivided-interest-mineral-rights",
+    category: "Co-Ownership",
+    keyword: "mineral rights undivided interest",
+    title: "When You Inherit a Share, Not the Whole: Understanding Co-Tenancy and Undivided Interest",
+    metaTitle: "Co-Tenancy & Undivided Mineral Interests for Heirs | Learning Center",
+    metaDescription:
+      "What it means to inherit an undivided fractional share of minerals with family: co-tenant rights, whether one owner can lease alone, accounting between co-owners, and partition as a last resort.",
+    summary:
+      "You own “a share” of minerals with siblings or cousins. Here’s what that actually gives you — and what happens when co-owners disagree.",
+    intro:
+      "Families rarely inherit minerals as a single block. More often, several relatives each inherit a fractional undivided interest — a percentage of the whole, not a separate piece of ground. That creates real practical questions.",
+    readingMinutes: 9,
+    topCta: { kind: "review", text: "Sharing inherited minerals with other family members and not sure how it works? Let’s sort through it together." },
+    sections: [
+      {
+        heading: "What “Undivided Interest” Actually Means (and Doesn’t Mean)",
+        blocks: [
+          {
+            type: "p",
+            text: "An undivided interest means each co-owner owns a percentage of the entire mineral tract, not a marked-off corner of it. If three siblings each inherit an undivided one-third, none of them owns a specific acre — they each own a third of every acre. This is the normal result of minerals passing to multiple heirs, and it’s why inherited interests get split into smaller and smaller fractions over generations.",
+          },
+        ],
+      },
+      {
+        heading: "The Rights Each Co-Tenant Has — Including the Ones That Might Surprise You",
+        blocks: [
+          {
+            type: "p",
+            text: "As a co-tenant, you generally have the right to your proportional share of income, the right to information about the property, and — in many states — the right to lease or develop your own interest without the others’ permission. You can usually also sell or transfer your own undivided share. What you typically cannot do is bind the other co-owners or sell their interests for them.",
+          },
+        ],
+      },
+      {
+        heading: "Can One Sibling Sign an Oil and Gas Lease Without the Others?",
+        blocks: [
+          {
+            type: "p",
+            text: "In many states, yes — a co-tenant can lease their own undivided interest without the others’ consent, and the lessee acquires rights only in that co-tenant’s share. But the rules around development, and what the non-leasing co-owners are owed, differ significantly by state. Some states treat a non-consenting co-tenant as entitled to an accounting for their share of production, sometimes after costs. This is exactly the kind of question that turns on state law.",
+          },
+          {
+            type: "callout",
+            title: "State law governs",
+            text: "Whether one co-tenant can act alone, and what the others are owed, varies substantially by state and is a question for an attorney familiar with that state’s law.",
+          },
+          { type: "cta", cta: { kind: "review", text: "One co-owner wants to lease and others don’t? Request a private review to understand your options." } },
+        ],
+      },
+      {
+        heading: "Accounting Between Co-Tenants: Who Gets Paid and How",
+        blocks: [
+          {
+            type: "p",
+            text: "When minerals produce, each co-owner is generally paid according to their fractional interest, reflected in their decimal interest on the division order. When one co-tenant develops or leases and others don’t, an “accounting” may determine how proceeds are shared — and whether the developing owner can recover certain costs first. How this works, again, depends on state law.",
+          },
+        ],
+      },
+      {
+        heading: "Partition: The Legal Option When Co-Owners Can’t Agree",
+        blocks: [
+          {
+            type: "p",
+            text: "When co-owners reach an impasse, partition is the legal process that can divide the property — or, more often with minerals, force a sale and split the proceeds. Partition is a real right in many states, but it is expensive, slow, and hard on family relationships. It’s best understood as a last resort, not a routine tool, and it should be discussed with an attorney before anyone pursues it.",
+          },
+        ],
+      },
+      {
+        heading: "Practical Strategies for Families Holding Minerals Together",
+        blocks: [
+          {
+            type: "bullets",
+            items: [
+              "Keep a shared, current record of who owns what fraction and how to reach each owner.",
+              "Agree in advance on how leasing or sale decisions will be discussed, even informally.",
+              "Consider whether a family LLC or trust would simplify management and future transfers.",
+              "Update ownership promptly when a co-owner dies, so interests don’t fragment unnoticed.",
+            ],
+          },
+          {
+            type: "p",
+            text: "Holding minerals well as a family is mostly about communication and recordkeeping. We can’t mediate disputes between heirs — that belongs with legal counsel — but understanding how co-tenancy works is the first step to avoiding them.",
+          },
+        ],
+      },
+    ],
+    guardrails: [
+      "Co-tenancy law, partition rights, and accounting rules vary substantially by state — no rule here is universal.",
+      "A co-tenant leasing without the others’ consent is allowed in many (not all) states, and the non-consenting owner’s accounting rights differ — treat this as state-specific and attorney-dependent.",
+      "Partition is expensive, slow, and emotionally costly — a last resort, not a routine option.",
+      "This site cannot help resolve a dispute between heirs; those questions belong with legal counsel.",
+    ],
+    sources: [
+      { label: "University of Denver Law Review — “Mineral Leases by Tenants in Common”", url: "https://digitalcommons.du.edu/cgi/viewcontent.cgi?article=6688&context=dlr" },
+      { label: "NARO — FAQ on co-ownership and mineral deeds", url: "https://www.naro-us.org/FAQ" },
+      { label: "Texas A&M AgriLife Extension — Oil and Gas Law (co-tenancy and co-tenant rights)", url: "https://agrilifeextension.tamu.edu/asset-external/oil-and-gas-law/" },
+      { label: "Oklahoma Corporation Commission — Royalty Owner Booklet", url: "https://oklahoma.gov/content/dam/ok/en/occ/documents/og/pubasst/Royalty-Owners-Booklet-112020.pdf" },
+    ],
+    related: ["reading-mineral-deed-explained", "oil-gas-lease-basics", "transferring-mineral-rights-estate-planning"],
+  },
+
+  // ---------------------------------------------------------------------------
+  {
+    slug: "net-mineral-acres-net-royalty-acres",
+    category: "Valuation & Selling",
+    keyword: "net mineral acres explained",
+    title: "Net Mineral Acres vs. Net Royalty Acres: The Two Numbers That Determine What an Offer Is Really Worth",
+    metaTitle: "Net Mineral Acres vs. Net Royalty Acres Explained | Learning Center",
+    metaDescription:
+      "The difference between a net mineral acre (NMA) and a net royalty acre (NRA), the simple math that connects them, why royalty rate changes everything, and how to compare offers apples-to-apples.",
+    summary:
+      "When a buyer offers “$3,000 per acre,” per acre of what? The NMA vs. NRA distinction can change an offer’s real value dramatically.",
+    intro:
+      "The difference between a net mineral acre and a net royalty acre can change the real value of an offer by a wide margin — depending on the royalty rate in your lease. Here’s the arithmetic, in plain English.",
+    readingMinutes: 8,
+    topCta: { kind: "offer", text: "Received an offer and not sure how to evaluate it? Let us help you compare what you’re actually being offered." },
+    sections: [
+      {
+        heading: "What a Net Mineral Acre (NMA) Is — and Why It’s Not Just “Acres”",
+        blocks: [
+          {
+            type: "p",
+            text: "A net mineral acre measures how much of the minerals you actually own beneath a tract. If a tract is 640 acres and you own an undivided one-half of the minerals, you own 320 net mineral acres. NMA is about ownership of the minerals themselves — independent of any lease or royalty rate.",
+          },
+        ],
+      },
+      {
+        heading: "What a Net Royalty Acre (NRA) Is and Why Buyers Use It",
+        blocks: [
+          {
+            type: "p",
+            text: "A net royalty acre measures your share of the royalty income, normalized to a standard royalty rate. By convention, one net royalty acre equals the royalty from one net mineral acre leased at a 1/8 (12.5%) royalty. Buyers like NRA because it expresses the income side directly, making interests with different royalty rates comparable.",
+          },
+        ],
+      },
+      {
+        heading: "The Math That Connects Them: Converting NMA to NRA",
+        blocks: [
+          {
+            type: "p",
+            text: "The conversion uses your actual lease royalty rate against the 1/8 baseline:",
+          },
+          {
+            type: "callout",
+            title: "The formula",
+            text: "Net Royalty Acres = Net Mineral Acres × (your royalty rate ÷ 1/8). For example, 100 NMA leased at a 1/4 (25%) royalty equals 100 × (0.25 ÷ 0.125) = 200 NRA. The same 100 NMA leased at 1/8 equals exactly 100 NRA.",
+          },
+        ],
+      },
+      {
+        heading: "Why Royalty Rate Is the Variable That Changes Everything",
+        blocks: [
+          {
+            type: "p",
+            text: "Because NRA scales with royalty rate, the same number of net mineral acres can be worth very different amounts depending on the lease. Minerals leased at a higher royalty produce more income per acre, so they convert to more net royalty acres — and a buyer paying “per NRA” is effectively paying for that higher income. This is why two offers that sound similar can be far apart in real value.",
+          },
+          { type: "cta", cta: { kind: "offer", text: "Two offers quoted differently and you can’t tell which is better? Get an offer review." } },
+        ],
+      },
+      {
+        heading: "How to Estimate How Many NMAs You Own When the Deed Isn’t Specific",
+        blocks: [
+          {
+            type: "p",
+            text: "Older deeds sometimes state a fraction without a clean acreage figure. You can estimate your NMA by multiplying the gross acres in the tract by your undivided mineral fraction. If the deed language is ambiguous, or the tract size is uncertain, this is where a landman or attorney can help — and where title disputes sometimes arise.",
+          },
+        ],
+      },
+      {
+        heading: "Using NMA and NRA to Compare Offers on an Apples-to-Apples Basis",
+        blocks: [
+          {
+            type: "p",
+            text: "When you receive an offer, first pin down the unit: is it per net mineral acre or per net royalty acre? Then convert both offers to the same unit using your royalty rate. Only after they’re in the same terms can you tell which is genuinely higher. The unit matters as much as the number.",
+          },
+        ],
+      },
+    ],
+    guardrails: [
+      "NMA calculations can be contested in title disputes; if you’re unsure of your exact acreage, consult a landman or attorney.",
+      "Current $/NMA and $/NRA market prices are highly local and time-sensitive — this article treats them as concepts only, not as price guidance.",
+      "The 1/8 royalty baseline used in NRA math is a definitional convention, not a legal minimum; actual lease royalties vary.",
+    ],
+    sources: [
+      { label: "NARO — Calculating Your Net Royalty Acres (formula and worked example)", url: "https://www.naro-us.org/blog/13134478" },
+      { label: "Mineral Rights Podcast — NMA vs. NRA explained (worked conversions)", url: "https://mineralrightspodcast.com/what-is-the-difference-between-a-net-mineral-acre-nma-and-a-net-royalty-acrenra/" },
+      { label: "Flat River Minerals — Net Mineral Acres vs. Net Royalty Acres", url: "https://flatriverminerals.com/resources/blog/net-mineral-acres-vs-net-royalty-acres/" },
+      { label: "Oil and Gas Lawyer Blog — Net Royalty Acres Defined", url: "https://www.oilandgaslawyerblog.com/net-royalty-acres-defined/" },
+    ],
+    related: ["mineral-rights-valuation-basics", "selling-inherited-mineral-rights", "oil-gas-lease-basics"],
+  },
+
+  // ---------------------------------------------------------------------------
+  {
+    slug: "mineral-rights-heir-mistakes",
+    category: "Getting Oriented",
+    keyword: "mineral rights heir mistakes",
+    title: "Five Mistakes Heirs Make With Inherited Mineral Rights (and How to Avoid Them)",
+    metaTitle: "5 Mistakes Heirs Make With Inherited Mineral Rights | Learning Center",
+    metaDescription:
+      "The five most common and costly mistakes heirs make with inherited minerals — signing the first offer, missing the step-up basis, incomplete probate, ignoring suspended royalties, and not knowing the interest type — with what to do instead.",
+    summary:
+      "Most owners make their biggest mistakes in the first six months. Here are the five errors specific to heirs — and how to avoid each.",
+    intro:
+      "Heirs are especially vulnerable to costly errors: they’re dealing with grief, unfamiliar paperwork, and pushy buyers all at once. These are the five mistakes that hurt heirs most, with practical guidance on what to do instead.",
+    readingMinutes: 9,
+    topCta: { kind: "review", text: "Want a second set of eyes before you make any decisions? That’s exactly what we’re here for." },
+    sections: [
+      {
+        heading: "Mistake #1: Signing the First Lease or Sale Offer That Arrives",
+        blocks: [
+          {
+            type: "p",
+            text: "An unsolicited offer tells you what one buyer or operator is willing to pay — not what your interest is worth. Heirs under time pressure sometimes sign the first thing they receive. The fix isn’t cynicism; it’s comparison. Get more than one opinion of value or more than one offer before you commit to anything.",
+          },
+          {
+            type: "callout",
+            title: "What to do instead",
+            text: "Treat the first offer as information, not a deadline. Solicit additional offers or a professional opinion of value before deciding. A legitimate buyer will give you time.",
+          },
+        ],
+      },
+      {
+        heading: "Mistake #2: Not Establishing Your Step-Up in Basis Before You Need It",
+        blocks: [
+          {
+            type: "p",
+            text: "When you inherit minerals, their tax basis is generally stepped up to fair market value as of the date of death. That stepped-up value can dramatically reduce your taxable gain if you ever sell — but only if you can document it. Heirs who never establish the date-of-death value can lose that benefit or scramble to reconstruct it years later.",
+          },
+          {
+            type: "callout",
+            title: "What to do instead",
+            text: "Establish and document the date-of-death value early, ideally with a CPA or qualified appraiser. The step-up is a federal tax concept; state implications vary, so confirm application with a professional.",
+          },
+        ],
+      },
+      {
+        heading: "Mistake #3: Assuming Probate Is “Done” When It Isn’t",
+        blocks: [
+          {
+            type: "p",
+            text: "Heirs often assume title transferred automatically, or that a probate in one state covered minerals in another. Incomplete probate is one of the most common reasons royalties stay suspended and sales stall. What counts as “complete” varies dramatically by state, and minerals in multiple states may need separate ancillary probates.",
+          },
+          {
+            type: "callout",
+            title: "What to do instead",
+            text: "Confirm with an attorney that title has actually transferred and been recorded in every state where you own minerals — not just where your relative lived.",
+          },
+        ],
+      },
+      {
+        heading: "Mistake #4: Overlooking Suspended or Unclaimed Royalties",
+        blocks: [
+          {
+            type: "p",
+            text: "Money owed to a deceased owner is frequently held in suspense by the operator, or turned over to the state as unclaimed property. Heirs who don’t go looking can leave years of royalties — sometimes substantial sums — unclaimed in state databases or in an operator’s suspense account.",
+          },
+          {
+            type: "callout",
+            title: "What to do instead",
+            text: "Search the free official databases for your family’s names, and contact operators directly to check for suspended funds. Then make sure you’re set up to receive future checks.",
+          },
+        ],
+      },
+      {
+        heading: "Mistake #5: Not Knowing Which Type of Interest You Actually Inherited",
+        blocks: [
+          {
+            type: "p",
+            text: "“Mineral rights” covers several different interests, and they don’t all behave the same way. A working interest, for example, can carry a share of operating costs and liabilities — very different from a cost-free royalty interest. Acting without knowing which you hold can lead to unexpected bills or bad decisions.",
+          },
+          {
+            type: "callout",
+            title: "What to do instead",
+            text: "Confirm in writing which type of interest you inherited — mineral, royalty, overriding royalty, or working interest — before you lease, sell, or sign anything.",
+          },
+          { type: "cta", cta: { kind: "review", text: "Not sure you’ve avoided these traps? Request a private review before you decide anything." } },
+        ],
+      },
+      {
+        heading: "Building a Simple System to Manage Your Minerals Going Forward",
+        blocks: [
+          {
+            type: "bullets",
+            items: [
+              "Keep a folder (paper or digital) with deeds, leases, division orders, and royalty statements.",
+              "Record the date-of-death value and any appraisal for basis purposes.",
+              "Track which operators pay you and keep your contact information current with them.",
+              "Note where minerals are located by state, so probate and taxes are handled in the right places.",
+            ],
+          },
+          {
+            type: "p",
+            text: "A little organization early prevents most of the expensive mistakes later. When in doubt, get a second opinion before acting.",
+          },
+        ],
+      },
+    ],
+    guardrails: [
+      "The step-up in basis is a federal tax concept; state-specific implications require a CPA.",
+      "Not all first offers are unfair — the point is to get multiple opinions before deciding, not to assume every buyer is lowballing.",
+      "“Incomplete” probate varies dramatically by state — what suffices in one state may not in another.",
+    ],
+    sources: [
+      { label: "Mineral Rights Podcast — Common Mineral Owner Mistakes", url: "https://mineralrightspodcast.com/mrp-202-common-mineral-owner-mistakes/" },
+      { label: "IRS Publication 559 — establishing basis of inherited property", url: "https://www.irs.gov/publications/p559" },
+      { label: "Gold, Khourey & Turak — Understanding Mineral Rights for Heirs and New Owners", url: "https://www.gkt.com/understanding-mineral-rights-heirs/" },
+      { label: "NARO — FAQ on documentation heirs need", url: "https://www.naro-us.org/FAQ" },
+      { label: "Blue Mesa Minerals — Finding Unclaimed Mineral Rights", url: "https://bluemesaminerals.com/finding-unclaimed-mineral-rights/" },
+    ],
+    related: ["what-are-inherited-mineral-rights", "inherited-mineral-rights-tax-basics", "unclaimed-mineral-royalties-heirs"],
+  },
+
+  // ---------------------------------------------------------------------------
+  {
+    slug: "oil-gas-lease-clauses-explained",
+    category: "Leasing",
+    keyword: "oil gas lease clauses",
+    title: "Key Oil and Gas Lease Clauses Every Heir Should Know Before Signing",
+    metaTitle: "Key Oil & Gas Lease Clauses Explained for Heirs | Learning Center",
+    metaDescription:
+      "Six oil and gas lease clauses in plain English: habendum, Pugh, pooling and unitization, post-production deductions, shut-in royalty, and force majeure — enough vocabulary to talk to an attorney.",
+    summary:
+      "A lease may look like boilerplate, but a few default clauses can cost you money or lock up your acreage. Here are six worth understanding.",
+    intro:
+      "Many of a lease’s most important provisions are negotiable, and a few — left in their default form — can cost an heir money or tie up acreage longer than expected. This explains six key clauses in plain English. No legal advice; just enough vocabulary to talk to an attorney.",
+    readingMinutes: 10,
+    topCta: { kind: "review", text: "Have a draft lease with clauses you don’t understand? Let’s talk through what they mean before you sign." },
+    sections: [
+      {
+        heading: "Why Lease Clauses Matter More Than the Bonus Check",
+        blocks: [
+          {
+            type: "p",
+            text: "The bonus is paid once; the clauses govern the relationship for years. A larger bonus can’t make up for a lease that deducts heavily from every royalty check or holds undeveloped acreage indefinitely. Understanding the clauses below is how you judge an offer beyond the headline number.",
+          },
+        ],
+      },
+      {
+        heading: "The Habendum Clause: How Long Does the Lease Actually Last?",
+        blocks: [
+          {
+            type: "p",
+            text: "The habendum clause sets the lease’s duration in two parts: a fixed “primary term” (the window to begin drilling or production) and a “secondary term” that continues the lease “so long as” there is production or other qualifying activity. The wording of this clause determines whether a lease ends on schedule or continues indefinitely once a well produces.",
+          },
+        ],
+      },
+      {
+        heading: "The Pugh Clause: Protecting Acreage That Isn’t in a Producing Unit",
+        blocks: [
+          {
+            type: "p",
+            text: "Without a Pugh clause, production from a small unit can hold your entire leased acreage — even parts never developed. A Pugh clause releases the undeveloped acreage (and sometimes deeper formations) back to you after the primary term, so the operator can’t keep idle acreage tied up indefinitely. The clause isn’t recognized or named the same way in every state.",
+          },
+          { type: "cta", cta: { kind: "review", text: "Want to understand how a clause affects your acreage? Request a private review before you sign." } },
+        ],
+      },
+      {
+        heading: "Pooling and Unitization: What Happens to Your Royalty When Wells Go Horizontal",
+        blocks: [
+          {
+            type: "p",
+            text: "Pooling and unitization clauses let the operator combine your tract with neighboring tracts into one drilling unit, which is how modern horizontal wells work. When that happens, you’re paid on your proportional share of the unit rather than the whole well. The clause’s terms — unit size limits, how allocation is calculated — affect your decimal interest, so they’re worth understanding.",
+          },
+        ],
+      },
+      {
+        heading: "Post-Production Deduction Clauses: How Companies Reduce Your Royalty at the Back End",
+        blocks: [
+          {
+            type: "p",
+            text: "After production, gas often must be gathered, compressed, transported, and processed before sale. A post-production deduction clause governs whether the operator can subtract a share of those costs from your royalty. This is one of the most litigated areas of lease law, and the rules are heavily state-specific — a clause to understand and discuss with your attorney, not one with a single right answer.",
+          },
+        ],
+      },
+      {
+        heading: "Shut-In Royalties and Force Majeure: The Clauses That Keep a Lease Alive Without Production",
+        blocks: [
+          {
+            type: "p",
+            text: "A shut-in royalty clause lets the operator keep a lease alive by paying a small fee when a well is capable of producing but temporarily shut in (for example, with no pipeline connection). A force majeure clause can suspend the operator’s obligations during events beyond its control. Both can extend a lease without active production, so it’s worth knowing how long and under what conditions they apply.",
+          },
+        ],
+      },
+    ],
+    guardrails: [
+      "The Pugh clause is not recognized or named the same way in all states; clause names and statutory versions vary by jurisdiction.",
+      "Post-production deduction rules are heavily state-specific and frequently litigated — understand and discuss the clause with your attorney; it is not universally prohibited or permitted.",
+      "Whether any specific clause should or shouldn’t be in a lease depends on the state, basin, and specific terms — this article doesn’t make that call.",
+      "Always have a licensed oil and gas attorney review any draft lease before signing.",
+    ],
+    sources: [
+      { label: "Texas Real Estate Research Center — Hints on Negotiating an Oil and Gas Lease", url: "https://trerc.tamu.edu/reports/hints-on-negotiating-an-oil-and-gas-lease/" },
+      { label: "Texas A&M AgriLife — Petroleum Production on Agricultural Lands (lease clause breakdown)", url: "https://agrilife.org/texasaglaw/2016/02/29/petroleum-production-on-agricultural-lands-in-texas-managing-risks-and-opportunities/" },
+      { label: "University of Oklahoma Law — Recent Developments in the Oil and Gas Habendum Clause", url: "https://digitalcommons.law.ou.edu/cgi/viewcontent.cgi?article=1366&context=onej" },
+      { label: "Berlin Royalties — Oil and Gas Lease Clauses: The Pugh Clause", url: "https://www.berlinroyalties.com/sell-oklahoma-mineral-rights-the-oil-scout/oil-and-gas-lease-clauses-and-provisions-part-2-the-pugh-clause" },
+      { label: "Texas A&M AgriLife Extension — Oil and Gas Law course", url: "https://agrilifeextension.tamu.edu/asset-external/oil-and-gas-law/" },
+    ],
+    related: ["oil-gas-lease-basics", "royalty-check-explained", "division-orders-explained"],
   },
 ];
 
