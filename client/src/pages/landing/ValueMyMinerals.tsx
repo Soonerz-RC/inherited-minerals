@@ -12,7 +12,11 @@ const content: LandingContent = {
   subhead:
     "Two parcels in the same county can be worth wildly different amounts. Value depends on whether the acreage is producing, the lease terms, location relative to active drilling, and commodity prices. We'll help you make sense of it — privately and at no cost.",
   primaryCta: "Get a private valuation review",
-  secondaryCta: { label: "How valuation works", route: "/start-here", content: "value-secondary" },
+  secondaryCta: {
+    label: "Try the value calculator",
+    route: "/tools/inherited-mineral-rights-calculator",
+    content: "value-calculator",
+  },
   points: [
     {
       icon: Gauge,

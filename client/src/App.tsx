@@ -18,6 +18,7 @@ import NotFound from "@/pages/not-found";
 import InheritedMineralRights from "@/pages/landing/InheritedMineralRights";
 import GotAnOffer from "@/pages/landing/GotAnOffer";
 import ValueMyMinerals from "@/pages/landing/ValueMyMinerals";
+import InheritedMineralRightsCalculator from "@/pages/tools/InheritedMineralRightsCalculator";
 import ThankYouReview from "@/pages/ThankYouReview";
 import ThankYouQuestion from "@/pages/ThankYouQuestion";
 import Privacy from "@/pages/legal/Privacy";
@@ -53,6 +54,10 @@ function AppRouter() {
         <Route path="/got-an-offer" component={GotAnOffer} />
         <Route path="/value-my-minerals" component={ValueMyMinerals} />
         <Route path="/value" component={ValueMyMinerals} />
+
+        {/* Tools */}
+        <Route path="/tools/inherited-mineral-rights-calculator" component={InheritedMineralRightsCalculator} />
+        <Route path="/calculator" component={InheritedMineralRightsCalculator} />
 
         {/* Thank-you / conversion pages */}
         <Route path="/thank-you/review" component={ThankYouReview} />
