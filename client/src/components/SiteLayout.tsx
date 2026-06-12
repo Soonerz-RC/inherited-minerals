@@ -127,6 +127,7 @@ export function SiteFooter() {
             <h2 className="text-sm font-semibold text-foreground">Owners</h2>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li><Link href="/value-my-minerals" className="hover:text-primary">Value my minerals</Link></li>
+              <li><Link href="/tools/inherited-mineral-rights-calculator" className="hover:text-primary">Value calculator</Link></li>
               <li><Link href="/got-an-offer" className="hover:text-primary">I got an offer</Link></li>
               <li><Link href="/sell" className="hover:text-primary">Request a private review</Link></li>
             </ul>

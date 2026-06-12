@@ -125,6 +125,32 @@ export async function submitAssistantLead(
 }
 
 /**
+ * Submit a value-calculator review request. Like the assistant handoff, this
+ * posts JSON directly to the live `form-to-slack` Netlify Function (the path
+ * production QA confirmed delivers to Slack #inherited and backs up to
+ * Airtable), under the registered `private-review-request` form so every field
+ * is captured. The calculator's inputs, rough range, and offer comparison are
+ * folded into `notes` by the caller, and `intent=calculator` flags the source.
+ * Rejects on any non-2xx so the UI only redirects/tracks on real delivery.
+ */
+export async function submitCalculatorReview(
+  data: Record<string, unknown>,
+): Promise<void> {
+  const res = await fetch(FORM_TO_SLACK_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      payload: { form_name: REVIEW_FORM_NAME, data },
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(
+      "We couldn't send your estimate for review just now. Please try again in a moment.",
+    );
+  }
+}
+
+/**
  * Submit a community question. Routes to Netlify Forms by default, or to the API
  * function when VITE_LEAD_BACKEND=api.
  */
